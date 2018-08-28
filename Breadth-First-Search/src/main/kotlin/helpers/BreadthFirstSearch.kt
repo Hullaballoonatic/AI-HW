@@ -2,22 +2,20 @@ package helpers
 
 import java.util.*
 
-class BreadthFirstSearch(root: Node) {
-    private val q: Queue<Node> = LinkedList(listOf(root))
-    private val visited: Set<Node> = TreeSet()
-    init {
-        visited.plus(root)
-        while (q.isNotEmpty()) {
-            val node = q.remove()
-            // are you the goal?
-            node.children.forEach { child ->
-                // isValid?
-                if (!visited.contains(child)) {
-                    visited.plus(child)
-                    q += child
-                }
-                // ifNeither add to queue
+fun <T : Node<T>> bfs(root: T): T? {
+    val q: Queue<T> = LinkedList(listOf(root))
+    val visited: Set<T> = TreeSet()
+    visited.plus(root)
+    while (q.isNotEmpty()) {
+        val node = q.remove()
+        if (node.isGoal) return node
+
+        node.children.forEach { child ->
+            if (child.isValid && child !in visited) {
+                visited.plus(child)
+                q += child
             }
         }
     }
+    return null
 }

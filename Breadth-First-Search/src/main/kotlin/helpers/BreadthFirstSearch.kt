@@ -1,20 +1,22 @@
 package helpers
 
-import puzzle.Grid
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 
-class BreadthFirstSearch<T>(root: Node<T>, graph: Grid<T, Node<T>>) {
-    private val q: Queue<Node<T>> = LinkedList(listOf(root))
+class BreadthFirstSearch(root: Node) {
+    private val q: Queue<Node> = LinkedList(listOf(root))
+    private val visited: Set<Node> = TreeSet()
     init {
-        root.visited = true
-        graph.action(root)
+        visited.plus(root)
         while (q.isNotEmpty()) {
             val node = q.remove()
-            node.unvisitedChildren.forEach { child ->
-                child.visited = true
-                graph.action(child)
-                q += child
+            // are you the goal?
+            node.children.forEach { child ->
+                // isValid?
+                if (!visited.contains(child)) {
+                    visited.plus(child)
+                    q += child
+                }
+                // ifNeither add to queue
             }
         }
     }

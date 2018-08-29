@@ -1,5 +1,7 @@
 package helpers
 
-abstract class Node<T>(val parent: Node<T>? = null, var children: List<Node<T>> = emptyList(), var visited: Boolean) {
-    val unvisitedChildren get() = children.filter { it.visited }
+abstract class Node<T: Node<T>>(val parent: T? = null) {
+    abstract val isGoal: Boolean
+    abstract val isValid: Boolean
+    abstract val children: List<T>
 }

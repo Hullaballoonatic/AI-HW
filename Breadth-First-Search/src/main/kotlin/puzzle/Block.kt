@@ -100,4 +100,14 @@ enum class Block(
     }
 }
 
-
+val blocks = listOf(
+        Block.ONE,
+        Block.TWO,
+        Block.THREE,
+        Block.FOUR,
+        Block.FIVE,
+        Block.SIX,
+        Block.SEVEN,
+        Block.EIGHT,
+        Block.NINE,
+        Block.TEN )

@@ -1,40 +1,25 @@
 package app.extensions
 
-import app.enums.blackSquaresToOccupiedSpacesMap
-import app.enums.blocks
+import app.game.allPieces
 
 val ByteArray.coordinatesOutput: String
     get() {
         val sb = StringBuilder()
-        this.toPairList.forEach {
-            sb.append("(" + it.first + "," + it.second + ") ")
+        for(i in this.indices step 2) {
+            sb.append("(" + this[i] + "," + this[i+1] + ") ")
         }
         return sb.trim().toString()
     }
 
 val ByteArray.isValid: Boolean
     get() {
-        val coordinates = this.toPairList
-        val occupiedSpaces = blackSquaresToOccupiedSpacesMap.toMutableMap()
-        blocks.forEachIndexed { b, block ->
-            val potentialConflicts = occupiedSpaces.filterKeys { it != block }.values
-            block.coordinates = coordinates[b]
-            block.currentOccupiedSpaces.forEach { space ->
-                if (space in potentialConflicts) {
-                    return false
-                } else {
-                    occupiedSpaces += block to space
-                }
+        val board = Array(10) { _ -> BooleanArray(10) {false} }
+        allPieces.forEachIndexed { p, piece ->
+            piece.getOccupiedSpaces(this[p * 2], this[p * 2 + 1]).forEach { space ->
+                if(board[space.col.toInt()][space.row.toInt()] == isOccupied) return false else board[space.col.toInt()][space.row.toInt()] = isOccupied
             }
         }
         return true
     }
 
-val ByteArray.toPairList: List<Pair<Byte, Byte>>
-    get() {
-        val result = ArrayList<Pair<Byte, Byte>>()
-        for (i in this.indices step 2) {
-            result += this[i] to this[i + 1]
-        }
-        return result
-    }
+const val isOccupied: Boolean = true

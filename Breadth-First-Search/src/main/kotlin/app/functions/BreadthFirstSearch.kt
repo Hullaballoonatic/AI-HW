@@ -1,25 +1,26 @@
 package app.functions
 
+import app.Main.Companion.viz
 import app.extensions.coordinatesOutput
 import app.extensions.isValid
-import app.gamestate.GameState
-import app.gamestate.GameStateComparator
+import app.game.GameState
+import app.game.GameStateComparator
 import java.io.PrintWriter
 import java.util.LinkedList
 import java.util.Queue
 import java.util.TreeSet
 
 val test = PrintWriter("test.txt")
-fun bfs(root: GameState): GameState? {
-    val q: Queue<GameState> = LinkedList(listOf(root))
+fun bfs(root: ByteArray): GameState? {
+    val q: Queue<GameState> = LinkedList(listOf(GameState(root)))
     val visited: MutableSet<ByteArray> = TreeSet(GameStateComparator)
-    visited += root.positions
+    visited += root
 
     while (q.isNotEmpty()) {
         val node = q.remove()
-        val p = node.positions.coordinatesOutput
-        test.print("\nPop: $p")
-        System.out.print("\nPop: $p")
+        test.println("Pop: ${node.positions.coordinatesOutput}")
+        System.out.println("popped")
+        viz.setState(node.positions)
         if (node.isGoal) return node
         node.children.forEach { child ->
             if (child.isValid && child !in visited) {

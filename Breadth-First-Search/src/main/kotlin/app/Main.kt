@@ -1,5 +1,6 @@
 package app
 
+import app.functions.bfs
 import java.io.PrintWriter
 
 class Main {
@@ -9,8 +10,7 @@ class Main {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            results.print("test")
-            //bfs(initialState)!!.printToFile(results)
+            bfs(initialState)!!.printToFile(PrintWriter(results))
         }
     }
 }

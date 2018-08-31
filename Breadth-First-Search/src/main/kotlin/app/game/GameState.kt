@@ -3,7 +3,6 @@ package app.game
 import app.extensions.b
 import app.extensions.coordinatesOutput
 import kotlinx.collections.immutable.toImmutableList
-import java.io.PrintWriter
 import java.util.ArrayList
 
 class GameState(val positions: ByteArray, val parent: GameState? = null) {
@@ -20,11 +19,5 @@ class GameState(val positions: ByteArray, val parent: GameState? = null) {
 
     val isGoal: Boolean get() = positions[0] == 4.b && positions[1] == (-2).b
 
-    fun printToFile(file: PrintWriter) {
-        if (parent != null) {
-            parent.printToFile(file)
-        } else {
-            file.println(positions.coordinatesOutput)
-        }
-    }
+    override fun toString(): String = if (parent != null) parent.toString() + "${positions.coordinatesOutput} \n" else "${positions.coordinatesOutput}\n"
 }

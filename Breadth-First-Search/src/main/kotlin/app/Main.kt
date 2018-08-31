@@ -10,7 +10,9 @@ class Main {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            bfs(initialState)!!.printToFile(PrintWriter(results))
+            val winner = bfs(initialState)!!
+            results.print(winner)
+            System.out.print(winner)
         }
     }
 }

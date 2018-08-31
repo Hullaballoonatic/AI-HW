@@ -2,13 +2,13 @@ package app.vizualization
 
 import javax.swing.JFrame
 
-class Viz @Throws(Exception::class) constructor(): JFrame() {
+object Viz : JFrame() {
     private val view = View(this)
     fun setState(value: ByteArray) {
         view.state = value
     }
+
     init {
-        view.addMouseListener(view)
         title = "Puzzle"
         setSize(482, 505)
         contentPane.add(view)

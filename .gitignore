@@ -3,3 +3,12 @@
 Breadth-First-Search/.idea/
 Breadth-First-Search/.gradle/
 Breadth-First-Search/build/
+*.bin
+*.lock
+*.xml
+*.iml
+*.xml
+*.class
+*.kotlin_module
+*.properties
+*.iml

@@ -1,7 +1,6 @@
-package app.vizualization
+package app.visualization
 
-import javax.swing.JFrame
-
+/*
 object Viz : JFrame() {
     private val view = View(this)
     fun setState(value: ByteArray) {
@@ -16,3 +15,4 @@ object Viz : JFrame() {
         isVisible = true
     }
 }
+*/

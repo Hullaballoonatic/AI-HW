@@ -5,9 +5,9 @@ package app.game
  */
 object GameStateComparator: Comparator<ByteArray> {
     override fun compare(arrA: ByteArray, arrB: ByteArray): Int {
-        for ((a,b) in arrA.zip(arrB)) {
-            if (a < b) return -1
-            if (a > b) return 1
+        for (i in arrA.indices) {
+            if (arrA[i] < arrB[i]) return -1
+            if (arrA[i] > arrB[i]) return 1
         }
         return 0
     }

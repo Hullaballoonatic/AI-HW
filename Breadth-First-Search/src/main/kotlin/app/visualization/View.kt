@@ -1,14 +1,9 @@
-package app.vizualization
-
-import app.game.BLACK_SQUARES
-import app.game.allPieces
-import java.awt.Graphics
-import javax.swing.JPanel
+package app.visualization
 
 /**
  * Adapted and modified from code provided by Dr. Gashler
  */
-
+/*
 internal class View(
     private val viz: Viz,
     private val size: Int = 48,
@@ -32,4 +27,4 @@ internal class View(
         }
     }
 }
-
+*/

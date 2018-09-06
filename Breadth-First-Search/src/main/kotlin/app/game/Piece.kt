@@ -1,7 +1,6 @@
 package app.game
 
-import kotlinx.collections.immutable.immutableListOf
-import kotlinx.collections.immutable.toImmutableList
+import app.extensions.b
 import java.awt.Color
 
 enum class Piece(
@@ -66,8 +65,8 @@ enum class Piece(
             (5 to 2)
     );
 
-    private val initialOccupiedSquares = overlayCoordinates.map { BoardSpace(it) }.toImmutableList()
-    fun getOccupiedSpaces(col: Byte, row: Byte) = initialOccupiedSquares.map { BoardSpace(it.col + col to it.row + row) }
+    private val initialOccupiedSquares = overlayCoordinates
+    fun getOccupiedSpaces(col: Byte, row: Byte): List<Pair<Byte,Byte>> = initialOccupiedSquares.map { (it.first + col).b to (it.second + row).b }
 }
 
 val BLACK_SQUARES = listOf(
@@ -81,9 +80,9 @@ val BLACK_SQUARES = listOf(
     (0 to 7), (1 to 7),                                                             (8 to 7), (9 to 7),
     (0 to 8), (1 to 8), (2 to 8),                                         (7 to 8), (8 to 8), (9 to 8),
     (0 to 9), (1 to 9), (2 to 9), (3 to 9), (4 to 9), (5 to 9), (6 to 9), (7 to 9), (8 to 9), (9 to 9)
-).map { BoardSpace(it) }
+).map { it.first.b to it.second.b }
 
-val allPieces = immutableListOf(
+val allPieces = listOf(
     Piece.ZERO,
     Piece.ONE,
     Piece.TWO,

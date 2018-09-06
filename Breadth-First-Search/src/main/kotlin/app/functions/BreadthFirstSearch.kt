@@ -1,11 +1,10 @@
 package app.functions
 
 import app.game.BLACK_SQUARES
-import app.game.BoardSpace
 import app.game.GameState
 import app.game.GameStateComparator
 import app.game.allPieces
-import app.vizualization.Viz
+//import app.visualization.Viz
 import java.util.LinkedList
 import java.util.Queue
 import java.util.TreeSet
@@ -17,22 +16,27 @@ fun bfs(root: ByteArray): GameState? {
 
     while (q.isNotEmpty()) {
         val node = q.remove()
-        Viz.setState(node.positions)
-
+        //Viz.setState(node.positions)
+        System.out.println("pop")
         if (node.isGoal) return node
         node.children.forEach { child ->
             if (child.isValid && child !in visited) {
                 visited += child
                 q += GameState(positions = child, parent = node)
+                System.out.println("push")
             }
         }
     }
     return null
 }
 
+
+val occupied = ArrayList<Pair<Byte,Byte>>(BLACK_SQUARES)
+
 val ByteArray.isValid: Boolean
     get() {
-        val occupied = ArrayList<BoardSpace>(BLACK_SQUARES)
+        occupied.clear()
+        occupied.addAll(BLACK_SQUARES)
         for(i in allPieces.indices) {
             allPieces[i].getOccupiedSpaces(this[i * 2], this[i * 2 + 1]).forEach {
                 if (it in occupied) return false else occupied += it

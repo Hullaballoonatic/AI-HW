@@ -1,10 +1,16 @@
 package app;// The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
 
-import javax.swing.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.Graphics;
+import java.io.IOException;
+import javax.swing.Timer;
 import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Comparator;
+import java.util.Arrays;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseEvent;
 
 class Controller implements MouseListener
 {

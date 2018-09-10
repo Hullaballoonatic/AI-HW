@@ -1,15 +1,20 @@
 package app;// The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
+import javax.swing.JFrame;
+import java.awt.Graphics;
+import javax.swing.JPanel;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.awt.Image;
 import java.util.ArrayList;
+import java.awt.Color;
+import javax.imageio.ImageIO;
+import java.awt.event.WindowEvent;
+import java.awt.event.MouseListener;
 
-import static app.ExtensionsKt.getBufferedImage;
+import static app.ExtensionsKt.getResource;
 
 public class View extends JFrame implements ActionListener {
 	Controller controller;
@@ -31,7 +36,7 @@ public class View extends JFrame implements ActionListener {
 		this.getContentPane().add(this.panel);
 		this.setVisible(true);
 
-		this.replayPoints = new ArrayList<>();
+		this.replayPoints = new ArrayList<Controller>();
 	}
 
 	public void actionPerformed(ActionEvent evt) {
@@ -44,7 +49,7 @@ public class View extends JFrame implements ActionListener {
 		Image image_robot;
 
 		MyPanel() throws Exception {
-			this.image_robot = ImageIO.read(getBufferedImage("textures/robot_blue.png"));
+			this.image_robot = ImageIO.read(getResource("textures/robot_blue.png"));
 		}
 
 		void drawTerrain(Graphics g) {
@@ -73,9 +78,11 @@ public class View extends JFrame implements ActionListener {
 
 		void drawSprites(Graphics g) {
 			ArrayList<Model.Sprite> sprites = model.getSprites();
-			for (Model.Sprite s : sprites) {
+			for(int i = 0; i < sprites.size(); i++) {
+
 				// Draw the robot image
-				g.drawImage(image_robot, (int) s.pos.getX() - 12, (int) s.pos.getY() - 32, null);
+				Model.Sprite s = sprites.get(i);
+				g.drawImage(image_robot, (int)s.x - 12, (int)s.y - 32, null);
 			}
 		}
 

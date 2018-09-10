@@ -6,9 +6,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.ArrayList;
 
-import static app.ExtensionsKt.getBufferedImage;
+import static app.ExtensionsKt.getResource;
 
 class Model {
+	public static final float EPSILON = 0.0001f; // A small number
+	public static final float XMAX = 1200.0f - EPSILON; // The maximum horizontal screen position. (The minimum is 0.)
+	public static final float YMAX = 600.0f - EPSILON; // The maximum vertical screen position. (The minimum is 0.)
+
 	private Controller controller;
 	private byte[] terrain;
 	private ArrayList<Sprite> sprites;
@@ -18,11 +22,12 @@ class Model {
 	}
 
 	void initGame() throws Exception {
-		BufferedImage bufferedImage = ImageIO.read(getBufferedImage("textures/terrain.png"));
+		BufferedImage bufferedImage = ImageIO.read(getResource("textures/terrain.png"));
 		if(bufferedImage.getWidth() != 60 || bufferedImage.getHeight() != 60)
 			throw new Exception("Expected the terrain image to have dimensions of 60-by-60");
 		terrain = ((DataBufferByte)bufferedImage.getRaster().getDataBuffer()).getData();
-		sprites = new ArrayList<>();
+		GameState.terrain = terrain;
+		sprites = new ArrayList<Sprite>();
 		sprites.add(new Sprite(100, 100));
 	}
 
@@ -31,51 +36,67 @@ class Model {
 	ArrayList<Sprite> getSprites() { return this.sprites; }
 
 	void update() {
-		for (Sprite sprite : sprites) sprite.update();
+		// Update the agents
+		for(int i = 0; i < sprites.size(); i++)
+			sprites.get(i).update();
 	}
 
 	// 0 <= x < MAP_WIDTH.
 	// 0 <= y < MAP_HEIGHT.
-	float getTravelSpeed(Position pos) {
-			int xx = (int)(pos.getX() * 0.1f);
-			int yy = (int)(pos.getY() * 0.1f);
-			if(xx >= 60) {
+	float getTravelSpeed(float x, float y) {
+			int xx = (int)(x * 0.1f);
+			int yy = (int)(y * 0.1f);
+			if(xx >= 60)
+			{
 				xx = 119 - xx;
 				yy = 59 - yy;
 			}
-			int p = 4 * (60 * yy + xx);
-			return Math.max(0.2f, Math.min(3.5f, -0.01f * (terrain[p + 1] & 0xff) + 0.02f * (terrain[p + 3] & 0xff)));
+			int pos = 4 * (60 * yy + xx);
+			return Math.max(0.2f, Math.min(3.5f, -0.01f * (terrain[pos + 1] & 0xff) + 0.02f * (terrain[pos + 3] & 0xff)));
 	}
 
 	Controller getController() { return controller; }
-	Position getPos() { return sprites.get(0).pos; }
-	Position getDestination() { return sprites.get(0).destination; }
+	float getX() { return sprites.get(0).x; }
+	float getY() { return sprites.get(0).y; }
+	float getDestinationX() { return sprites.get(0).xDestination; }
+	float getDestinationY() { return sprites.get(0).yDestination; }
 
-	void setDestination(Position pos) {
-		sprites.get(0).destination = pos;
+	void setDestination(float x, float y) {
+		Sprite s = sprites.get(0);
+		s.xDestination = x;
+		s.yDestination = y;
 	}
 
 	double getDistanceToDestination(int sprite) {
 		Sprite s = sprites.get(sprite);
-		return s.pos.distanceTo(s.destination);
+		return Math.sqrt((s.x - s.xDestination) * (s.x - s.xDestination) + (s.y - s.yDestination) * (s.y - s.yDestination));
 	}
 
 	class Sprite {
-		Position pos;
-		Position destination;
+		float x;
+		float y;
+		float xDestination;
+		float yDestination;
 
 		Sprite(float x, float y) {
-			pos = new Position(x, y);
-			destination = pos;
+			this.x = x;
+			this.y = y;
+			this.xDestination = x;
+			this.yDestination = y;
 		}
 
 		void update() {
-			float speed = Model.this.getTravelSpeed(pos);
-			Position d = destination.minus(pos);
-			float dist = (float)Math.sqrt(d.getX() * d.getX() + d.getY() * d.getY());
+			float speed = Model.this.getTravelSpeed(this.x, this.y);
+			float dx = this.xDestination - this.x;
+			float dy = this.yDestination - this.y;
+			float dist = (float)Math.sqrt(dx * dx + dy * dy);
 			float t = speed / Math.max(speed, dist);
-			d.timesAssign(t);
-			pos.plusAssign(d);
+			dx *= t;
+			dy *= t;
+			this.x += dx;
+			this.y += dy;
+			this.x = Math.max(0.0f, Math.min(XMAX, this.x));
+			this.y = Math.max(0.0f, Math.min(YMAX, this.y));
 		}
 	}
 }

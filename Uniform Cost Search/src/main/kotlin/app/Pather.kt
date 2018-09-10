@@ -3,18 +3,17 @@ package app
 import java.util.PriorityQueue
 import java.util.TreeSet
 
-class Pather(
-    private val q: PriorityQueue<Position> = PriorityQueue(PositionCostComparator())
-) {
+class Pather {
+    val frontier: PriorityQueue<Position> = PriorityQueue(PositionCostComparator())
     private val visited = TreeSet(PositionComparator())
 
     fun bfs(start: Position, stop: Position): Position {
         start.reset()
-        q += start
+        frontier += start
         visited += start
 
-        while (q.isNotEmpty) {
-            val node = q.remove()
+        while (frontier.isNotEmpty) {
+            val node = frontier.remove()
             if (node == stop) return node
             node.children.forEach { child ->
                 if (child in visited) {
@@ -23,7 +22,7 @@ class Pather(
                         existingNode.parent = node
                 } else {
                     child.parent = node
-                    q += child
+                    frontier += child
                     visited += child
                 }
             }

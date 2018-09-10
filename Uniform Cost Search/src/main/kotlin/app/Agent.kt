@@ -1,17 +1,17 @@
 package app
 
-import java.awt.Color
+import java.awt.Color.red
+import java.awt.Color.yellow
 import java.awt.Graphics
-import java.util.PriorityQueue
 
 internal class Agent {
 
     fun drawPlan(g: Graphics, m: Model) {
-        g.color = Color.red
-        g.drawLine(m.pos.x.I, m.pos.x.I, m.destination.x.I, m.destination.y.I)
+        g.color = red
+        g.drawLine(m.pos, m.destination)
 
-        g.color = Color.yellow
-        frontier.forEach { pos -> g.drawOval(pos.x.I, pos.y.I, 8, 8) }
+        g.color = yellow
+        for (pos in pather.frontier) g.drawOval(pos, 8, 8)
     }
 
     fun update(m: Model) {
@@ -24,9 +24,7 @@ internal class Agent {
     }
 
     companion object {
-        private val frontier = PriorityQueue<Position>(PositionCostComparator())
-        val pather = Pather(frontier)
-
+        val pather = Pather()
         @Throws(Exception::class)
         @JvmStatic
         fun main(args: Array<String>) {

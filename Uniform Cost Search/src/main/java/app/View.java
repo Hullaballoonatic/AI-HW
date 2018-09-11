@@ -1,29 +1,21 @@
 package app;// The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
 
-import javax.swing.JFrame;
-import java.awt.Graphics;
-import javax.swing.JPanel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.awt.Image;
-import java.util.ArrayList;
-import java.awt.Color;
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import static app.ExtensionsKt.getResource;
 
 public class View extends JFrame implements ActionListener {
-	Controller controller;
-	Model model;
-	private MyPanel panel;
-	private ArrayList<Controller> replayPoints;
-	private int slomo;
+	private Controller controller;
+	private Model model;
 
-	public View(Controller c, Model m) throws Exception {
+	View(Controller c, Model m) throws Exception {
 		this.controller = c;
 		this.model = m;
 
@@ -31,12 +23,10 @@ public class View extends JFrame implements ActionListener {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setTitle("Moving Robot");
 		this.setSize(1203, 636);
-		this.panel = new MyPanel();
-		this.panel.addMouseListener(controller);
-		this.getContentPane().add(this.panel);
+		MyPanel panel = new MyPanel();
+		panel.addMouseListener(controller);
+		this.getContentPane().add(panel);
 		this.setVisible(true);
-
-		this.replayPoints = new ArrayList<Controller>();
 	}
 
 	public void actionPerformed(ActionEvent evt) {
@@ -78,11 +68,10 @@ public class View extends JFrame implements ActionListener {
 
 		void drawSprites(Graphics g) {
 			ArrayList<Model.Sprite> sprites = model.getSprites();
-			for(int i = 0; i < sprites.size(); i++) {
+			for (Model.Sprite s : sprites) {
 
 				// Draw the robot image
-				Model.Sprite s = sprites.get(i);
-				g.drawImage(image_robot, (int)s.x - 12, (int)s.y - 32, null);
+				g.drawImage(image_robot, (int) s.x - 12, (int) s.y - 32, null);
 			}
 		}
 
@@ -96,7 +85,7 @@ public class View extends JFrame implements ActionListener {
 			// Draw the view
 			drawTerrain(g);
 			drawSprites(g);
-			controller.agent.drawPlan(g, model);
+			controller.agent.drawPlan(g); //draw line + frontierBFS
 		}
 	}
 }

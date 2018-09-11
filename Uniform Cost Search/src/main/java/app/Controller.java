@@ -1,27 +1,21 @@
 package app;// The contents of this file are dedicated to the public domain.
 // (See http://creativecommons.org/publicdomain/zero/1.0/)
 
-import java.awt.Graphics;
-import java.io.IOException;
-import javax.swing.Timer;
-import java.util.LinkedList;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.Comparator;
-import java.util.Arrays;
-import java.awt.event.MouseListener;
+import javax.swing.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.LinkedList;
 
 class Controller implements MouseListener
 {
 	Agent agent;
-	Model model; // holds all the game data
-	View view; // the GUI
-	LinkedList<MouseEvent> mouseEvents; // a queue of mouse events
+	private Model model; // holds all the game data
+	private View view; // the GUI
+	private LinkedList<MouseEvent> mouseEvents; // a queue of mouse events
 
-	Controller() {
+	private Controller() {
 		this.agent = new Agent();
-		this.mouseEvents = new LinkedList<MouseEvent>();
+		this.mouseEvents = new LinkedList<>();
 	}
 
 	private void init() throws Exception {
@@ -35,9 +29,7 @@ class Controller implements MouseListener
 		return true;
 	}
 
-	Model getModel() { return model; }
-
-	MouseEvent nextMouseEvent() {
+	MouseEvent nextMouseEvent() { //get next mouse event; mouse event contains mouse x and y values
 		if(mouseEvents.size() == 0)
 			return null;
 		return mouseEvents.remove();

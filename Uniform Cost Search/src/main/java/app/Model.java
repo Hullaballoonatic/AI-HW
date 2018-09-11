@@ -26,9 +26,9 @@ class Model {
 		if(bufferedImage.getWidth() != 60 || bufferedImage.getHeight() != 60)
 			throw new Exception("Expected the terrain image to have dimensions of 60-by-60");
 		terrain = ((DataBufferByte)bufferedImage.getRaster().getDataBuffer()).getData();
-		GameState.terrain = terrain;
 		sprites = new ArrayList<Sprite>();
 		sprites.add(new Sprite(100, 100));
+		Agent.setLowest(getLowestTravelSpeed());
 	}
 
 	// These methods are used internally. They are not useful to the agents.
@@ -37,8 +37,7 @@ class Model {
 
 	void update() {
 		// Update the agents
-		for(int i = 0; i < sprites.size(); i++)
-			sprites.get(i).update();
+		for (Sprite sprite : sprites) sprite.update();
 	}
 
 	// 0 <= x < MAP_WIDTH.
@@ -53,6 +52,17 @@ class Model {
 			}
 			int pos = 4 * (60 * yy + xx);
 			return Math.max(0.2f, Math.min(3.5f, -0.01f * (terrain[pos + 1] & 0xff) + 0.02f * (terrain[pos + 3] & 0xff)));
+	}
+
+	float getLowestTravelSpeed() {
+		float min = getTravelSpeed(0,0 );
+		float tmp;
+		for (int x = 0; x < XMAX; x+=10) {
+			for (int y = 0; y < YMAX; y+=10) {
+				if ((tmp = getTravelSpeed(x,y)) < min) min = tmp;
+			}
+		}
+		return min;
 	}
 
 	Controller getController() { return controller; }
@@ -95,7 +105,7 @@ class Model {
 			dy *= t;
 			this.x += dx;
 			this.y += dy;
-			this.x = Math.max(0.0f, Math.min(XMAX, this.x));
+			this.x = Math.max(0.0f, Math.min(XMAX, this.x)); //prevent go out the border
 			this.y = Math.max(0.0f, Math.min(YMAX, this.y));
 		}
 	}

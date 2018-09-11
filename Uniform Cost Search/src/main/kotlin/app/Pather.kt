@@ -7,7 +7,7 @@ internal class Pather {
     private val visited = TreeSet(GameStatePositionComparator())
     lateinit var frontier: PriorityQueue<GameState>
 
-    fun bfs(start: GameState, stop: Pair<Int,Int>, comp: Comparator<GameState>): List<GameState> {
+    fun search(start: GameState, stop: Pair<Int,Int>, comp: Comparator<GameState>): List<GameState> {
         frontier = PriorityQueue(comp)
         frontier.add(start)
         visited.clear()

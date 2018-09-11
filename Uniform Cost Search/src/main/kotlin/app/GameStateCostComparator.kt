@@ -6,4 +6,6 @@ internal class GameStateCostComparator : Comparator<GameState> {
         a.cost < b.cost -> -1
         else            -> 0
     }
+
+    override fun toString() = "ucs"
 }

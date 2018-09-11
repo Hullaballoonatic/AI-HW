@@ -26,7 +26,7 @@ class Model {
 		if(bufferedImage.getWidth() != 60 || bufferedImage.getHeight() != 60)
 			throw new Exception("Expected the terrain image to have dimensions of 60-by-60");
 		terrain = ((DataBufferByte)bufferedImage.getRaster().getDataBuffer()).getData();
-		sprites = new ArrayList<Sprite>();
+		sprites = new ArrayList<>();
 		sprites.add(new Sprite(100, 100));
 		Agent.setLowest(getLowestTravelSpeed());
 	}
@@ -80,6 +80,10 @@ class Model {
 	double getDistanceToDestination(int sprite) {
 		Sprite s = sprites.get(sprite);
 		return Math.sqrt((s.x - s.xDestination) * (s.x - s.xDestination) + (s.y - s.yDestination) * (s.y - s.yDestination));
+	}
+
+	double getDistanceToDestination(int x, int y) {
+		return Math.sqrt((x - sprites.get(0).xDestination) * (x - sprites.get(0).xDestination) + (y - sprites.get(0).yDestination) * (y - sprites.get(0).yDestination));
 	}
 
 	class Sprite {

@@ -7,6 +7,8 @@ internal class AStarSearchCostComparator : Comparator<GameState> {
         else            -> 0
     }
 
+    override fun toString() = "a*"
+
     companion object {
         var heuristic: Double = 0.1
     }

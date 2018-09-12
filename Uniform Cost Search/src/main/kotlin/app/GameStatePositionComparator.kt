@@ -1,6 +1,6 @@
 package app
 
-internal class GameStatePositionComparator : Comparator<GameState> {
+internal object GameStatePositionComparator : Comparator<GameState> {
     override fun compare(a: GameState, b: GameState): Int {
         val ax = a.x.truncate
         val bx = b.x.truncate

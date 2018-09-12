@@ -1,9 +1,12 @@
 package app
 
+import java.awt.Color
 import java.awt.Graphics
+import java.awt.event.MouseEvent
 import java.awt.image.BufferedImage
 import java.io.FileNotFoundException
 import java.io.InputStream
+import javax.swing.SwingUtilities.isLeftMouseButton
 
 val Collection<*>.isNotEmpty get() = !isEmpty()
 
@@ -14,6 +17,14 @@ fun getResource(filepath: String): InputStream =
             ?: Thread.currentThread().contextClassLoader.getResourceAsStream(filepath)
             ?: throw FileNotFoundException(filepath)
 
-fun Graphics.drawLine(x1: Number, y1: Number, x2: Number, y2: Number) = this.drawLine(x1.toInt(), y1.toInt(), x2.toInt(), y2.toInt())
+internal fun Graphics.drawLine(color: Color, points: Pair<GameState, GameState>) {
+    this.color = color
+    this.drawLine(points.first.x.toInt(), points.first.y.toInt(), points.second.x.toInt(), points.second.y.toInt())
+}
 
-fun Graphics.drawOval(x: Number, y: Number, width: Int, height: Int) = this.drawOval(x.toInt(), y.toInt(), width, height)
+internal  fun Graphics.drawCircle(color: Color, a: GameState, circumference: Int) {
+    this.color = color
+    this.drawOval(a.x.toInt(), a.y.toInt(), circumference, circumference)
+}
+
+val MouseEvent.isLeftMouseClick get() = isLeftMouseButton(this)

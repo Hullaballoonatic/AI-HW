@@ -1,15 +1,28 @@
 package app
 
-internal class AStarSearchCostComparator : Comparator<GameState> {
-    override fun compare(a: GameState, b: GameState) = when {
-        a.cost + heuristic > b.cost + heuristic -> 1
-        a.cost + heuristic < b.cost + heuristic -> -1
-        else            -> 0
+import kotlin.math.sqrt
+
+internal object AStarSearchCostComparator : Comparator<GameState> {
+    override fun compare(a: GameState, b: GameState): Int {
+        val aHeur = dist(a,goal!!) * lowestCost
+        val bHeur = dist(b,goal!!) * lowestCost
+        return when {
+            a.cost + aHeur * 0 > b.cost + bHeur * 0 -> 1
+            a.cost + aHeur * 0 < b.cost + bHeur * 0 -> -1
+            else                            -> 0
+        }
+    }
+
+    private fun dist(a: GameState, b: GameState): Float {
+        val dx = a.x - b.x
+        val dy = a.y - b.y
+        return sqrt(dx*dx + dy*dy)
     }
 
     override fun toString() = "a*"
 
-    companion object {
-        var heuristic: Double = 0.1
-    }
+    var goal: GameState? = null
+
+    @JvmStatic
+    var lowestCost = 0f
 }

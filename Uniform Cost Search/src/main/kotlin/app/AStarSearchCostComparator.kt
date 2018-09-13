@@ -7,9 +7,9 @@ internal object AStarSearchCostComparator : Comparator<GameState> {
         val aHeur = dist(a,goal!!) * lowestCost
         val bHeur = dist(b,goal!!) * lowestCost
         return when {
-            a.cost + aHeur * 0 > b.cost + bHeur * 0 -> 1
-            a.cost + aHeur * 0 < b.cost + bHeur * 0 -> -1
-            else                            -> 0
+            a.cost + aHeur > b.cost + bHeur -> 1
+            a.cost + aHeur < b.cost + bHeur -> -1
+            else                                    -> 0
         }
     }
 

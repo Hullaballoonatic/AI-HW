@@ -3,7 +3,7 @@ package app
 import java.util.PriorityQueue
 import java.util.TreeSet
 
-internal object Pather {
+internal object CostSearch {
     private val visited = TreeSet(GameStatePositionComparator)
     lateinit var q: PriorityQueue<GameState>
 

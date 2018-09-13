@@ -21,8 +21,7 @@ internal class Agent {
             comp = if (isLeftMouseButton(e)) GameStateCostComparator else AStarSearchCostComparator
         }
         if (goal != null) {
-            path =  Pather.search(GameState(m), goal!!, comp)
-
+            path = CostSearch.search(GameState(m), goal!!, comp)
             try {
                 m.setDestination(path[1])
             } catch (_: IndexOutOfBoundsException) {
@@ -40,7 +39,7 @@ internal class Agent {
                 AStarSearchCostComparator.goal = value
             }
         private var path: List<GameState> = emptyList()
-        private val frontier get() = Pather.q
+        private val frontier get() = CostSearch.q
 
         @Throws(Exception::class)
         @JvmStatic

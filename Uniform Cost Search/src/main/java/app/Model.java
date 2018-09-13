@@ -40,6 +40,10 @@ class Model {
 		for (Sprite sprite : sprites) sprite.update();
 	}
 
+	double getCost(float x, float y) {
+		return getDistanceToDestination(0) / getTravelSpeed(x, y);
+	}
+
 	float getTravelSpeed(float x, float y) {
 			int xx = (int)(x * 0.1f);
 			int yy = (int)(y * 0.1f);

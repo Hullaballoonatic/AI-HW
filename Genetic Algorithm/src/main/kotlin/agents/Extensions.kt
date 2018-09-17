@@ -21,7 +21,14 @@ fun getSFX(filename: String): InputStream {
 }
 
 fun Matrix.map(action: (DoubleArray) -> Unit) {
-    for (i in 0..this.rows()) action(this.row(i))
+    for (i in 0 until this.rows()) action(this.row(i))
 }
 
-fun Random.playOdds(odds: Pair<Int, Int>): Boolean = this.nextInt(odds.second) in List(odds.first) { it }
+fun Random.playOdds(odds: Pair<Int, Int>): Boolean {
+    val a = if (odds.first <= 0) 1 else odds.first
+    val b = if (odds.second <= 0) 1 else odds.second
+    return this.nextInt(b) in List(a) { it }
+}
+
+operator fun Pair<Int,Int>.plus(o: Pair<Int,Int>): Pair<Int,Int> = this.first + o.first to this.second * o.second
+operator fun Int.times(o: Pair<Int,Int>): Pair<Int,Int> = this * o.first to this * o.second

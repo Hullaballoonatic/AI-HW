@@ -1,7 +1,6 @@
 
 *.xml
 Breadth-First-Search/.idea/
-Breadth-First-Search/.gradle/
 Breadth-First-Search/build/
 *.bin
 *.lock
@@ -9,6 +8,4 @@ Breadth-First-Search/build/
 *.iml
 *.xml
 *.class
-*.kotlin_module
-*.properties
 *.iml

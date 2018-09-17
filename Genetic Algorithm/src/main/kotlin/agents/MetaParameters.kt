@@ -1,5 +1,7 @@
 package agents
 
+import agents.Game.score
+
 /*
 This algorithm requires several meta-parameters
     the mutation rate,
@@ -15,9 +17,12 @@ You will need to cut off these extra values before you return the weights for th
  */
 
 object MetaParameters {
-    var MUTATION_ODDS = 1 to 10
-    var KILL_ODDS = 1 to 3
-    var NUM_MATES = 3
-    var AVG_DEVIATION = 0.03
-    var NUM_TOURNAMENTS = 100
+    val MUTATION_ODDS get() = 1 to 2 // decrease with wins
+    val KILL_ODDS get() = 1 to 3 // decrease with wins
+    val NUM_MATES get() = 5 // increase with wins
+    val AVG_DEVIATION get() = 0.1 // decrease with wins
+    val NUM_TOURNAMENTS get() = 100 // dunno
+    val NUM_SELECTIONS get() = 40 // dunno
+
+    override fun toString() = String.format("MUT: $MUTATION_ODDS, KIL: $KILL_ODDS, #TR: $NUM_TOURNAMENTS\n")
 }

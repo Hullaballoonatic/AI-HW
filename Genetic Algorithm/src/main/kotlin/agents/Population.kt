@@ -2,13 +2,14 @@ package agents
 
 import java.lang.Math.abs
 import java.util.Random
+import java.util.concurrent.ThreadLocalRandom
 
 class Population(val size: Int = 100) : Matrix(size, NUM_CHROMOSOMES) {
     init {
         this.map { chromosome -> chromosome.map { gene -> gene + 0.03 * rand.nextGaussian() } }
     }
 
-    private val randomChromosomeIndex get() = rand.nextInt(size)
+    private val randomChromosomeIndex get() = rand.nextInt(rows())
     private val randomChromosome get() = this.row(randomChromosomeIndex)
 
     fun select(times: Int = 1) = repeat(times) {
@@ -21,12 +22,12 @@ class Population(val size: Int = 100) : Matrix(size, NUM_CHROMOSOMES) {
     }
 
     fun repopulate() {
-        while (this.rows() < size) {
+        while (rows() < size) {
             mate()
         }
     }
 
-    private fun similarity(a: DoubleArray, b: DoubleArray): Double = abs(a.sum() - b.sum())
+    private fun DoubleArray.similarityTo(to: DoubleArray): Double = abs(this.sum() - to.sum())
     /*
     (3) For replenishing the population, please implement cross-over to produce new chromosomes that replace the dead ones.
     Randomly choose the first parent. Randomly choose a few candidates for the other parent. Pick the one most similar to the first parent.
@@ -35,12 +36,12 @@ class Population(val size: Int = 100) : Matrix(size, NUM_CHROMOSOMES) {
     private fun mate() {
         val mother = randomChromosome
         val father = List<DoubleArray>(MetaParameters.NUM_MATES) { randomChromosome }.asSequence()
-            .sortedBy { candidate -> similarity(mother, candidate) }
+            .sortedBy { candidate -> candidate.similarityTo(mother) }
             .first()
         this.newRow().mapIndexed { n, _ -> if (rand.nextInt(2) == 0) mother[n] else father[n] }.toDoubleArray()
     }
 
-    fun DoubleArray.mutate(deviation: Double = MetaParameters.AVG_DEVIATION) {
+    private fun DoubleArray.mutate(deviation: Double = MetaParameters.AVG_DEVIATION) {
         this[rand.nextInt(NUM_CHROMOSOMES)] += deviation * rand.nextGaussian()
     }
 
@@ -49,7 +50,7 @@ class Population(val size: Int = 100) : Matrix(size, NUM_CHROMOSOMES) {
     }
 
     companion object {
-        val rand: Random = Random()
+        val rand: Random get() = ThreadLocalRandom.current()
         const val NUM_CHROMOSOMES = 291
     }
 }

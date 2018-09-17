@@ -1,28 +1,30 @@
 package agents
+import agents.MetaParameters.NUM_TOURNAMENTS
 
 internal object Game {
+    var score = 0
+
     private fun evolveWeights(): DoubleArray {
         // Create a random initial population
 
         val population = Population(size = 100)
-
-        repeat(times = MetaParameters.NUM_TOURNAMENTS) {
-            population.select()
-            population.repopulate()
-            population.mutate()
+        while (NUM_TOURNAMENTS >= 0) {
+            repeat(times = NUM_TOURNAMENTS) {
+                population.select()
+                population.repopulate()
+                population.mutate()
+            }
+            score += Controller.doBattleNoGui(ReflexAgent(), NeuralAgent(population.row(0)))
+            System.out.printf("\n-- score: $score\n")
         }
-        // Evolve the population
-        // todo: YOUR CODE WILL START HERE.
-        //       Please write some code to evolve this population.
-        //       (For tournament selection, you will need to call Controller.doBattleNoGui(agent1, agent2).)
-
-        // Return an arbitrary member from the population
         return population.row(0)
     }
 
     @Throws(Exception::class)
     @JvmStatic
-    fun main(args: Array<String>) = Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
+    fun main(args: Array<String>) {
+        Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
+    }
 }
 
 

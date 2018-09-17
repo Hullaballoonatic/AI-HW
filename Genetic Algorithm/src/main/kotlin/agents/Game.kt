@@ -4,10 +4,12 @@ internal object Game {
     private fun evolveWeights(): DoubleArray {
         // Create a random initial population
 
-        val population = Population(100)
+        val population = Population(size = 100)
 
-        repeat(MetaParameters.NUM_TOURNAMENTS) {
-
+        repeat(times = MetaParameters.NUM_TOURNAMENTS) {
+            population.select()
+            population.repopulate()
+            population.mutate()
         }
         // Evolve the population
         // todo: YOUR CODE WILL START HERE.

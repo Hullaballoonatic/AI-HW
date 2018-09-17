@@ -2,10 +2,6 @@
 *.xml
 Breadth-First-Search/.idea/
 Breadth-First-Search/build/
-*.bin
-*.lock
-*.xml
-*.iml
-*.xml
-*.class
-*.iml
+Genetic Algorithm/build/
+Genetic Algorithm/.idea/
+Genetic Algorithm/out/

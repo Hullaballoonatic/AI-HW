@@ -1,7 +1,5 @@
 package agents
 
-import agents.Game.score
-
 /*
 This algorithm requires several meta-parameters
     the mutation rate,
@@ -16,13 +14,14 @@ Add some additional elements to your chromosomes to encode these meta-parameters
 You will need to cut off these extra values before you return the weights for the neural network.
  */
 
-object MetaParameters {
-    val MUTATION_ODDS get() = 1 to 2 // decrease with wins
-    val KILL_ODDS get() = 1 to 3 // decrease with wins
-    val NUM_MATES get() = 5 // increase with wins
-    val AVG_DEVIATION get() = 0.1 // decrease with wins
-    val NUM_TOURNAMENTS get() = 100 // dunno
-    val NUM_SELECTIONS get() = 40 // dunno
-
-    override fun toString() = String.format("MUT: $MUTATION_ODDS, KIL: $KILL_ODDS, #TR: $NUM_TOURNAMENTS\n")
+object Settings {
+    const val MUTATION_CHANCE = 0.4
+    const val KILL_CHANCE = 0.3 // decrease with wins
+    const val NUM_CANDIDATE_MATES = 5.0 // increase with wins
+    const val AVG_DEVIATION = 0.1 // decrease with wins
+    const val NUM_SELECTIONS = 40 // dunno
+    const val NUM_GENERATIONS = 10000
+    const val FITNESS_PER_GEN_METRIC = 100
+    const val NUM_CHROMOSOMES = 291
+    const val NUM_META_PARAMETERS = 4
 }

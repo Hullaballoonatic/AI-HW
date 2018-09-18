@@ -1,22 +1,28 @@
 package agents
-import agents.MetaParameters.NUM_TOURNAMENTS
+import agents.Settings.FITNESS_PER_GEN_METRIC
+import agents.Settings.NUM_GENERATIONS
+import java.lang.System.out
 
 internal object Game {
-    var score = 0
 
     private fun evolveWeights(): DoubleArray {
-        // Create a random initial population
-
         val population = Population(size = 100)
-        while (NUM_TOURNAMENTS >= 0) {
-            repeat(times = NUM_TOURNAMENTS) {
-                population.select()
-                population.repopulate()
-                population.mutate()
-            }
-            score += Controller.doBattleNoGui(ReflexAgent(), NeuralAgent(population.row(0)))
-            System.out.printf("\n-- score: $score\n")
+        out.print(population)
+
+        val fitnessOverTime = List(NUM_GENERATIONS / FITNESS_PER_GEN_METRIC) { 0.0 }
+
+        fitnessOverTime.mapIndexed { i, _ ->
+            population.apply {
+                repeat(FITNESS_PER_GEN_METRIC) { _ ->
+                    generation++
+                    out.print(population)
+                    selection()
+                    population()
+                    mutation(fitnessOverTime[i - 2] == fitnessOverTime[i - 1])
+                }
+            }.bestFitness
         }
+
         return population.row(0)
     }
 
@@ -26,8 +32,3 @@ internal object Game {
         Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
     }
 }
-
-
-
-
-

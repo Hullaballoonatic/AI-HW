@@ -17,7 +17,7 @@ internal object Game {
                 }
             }.fittestMember
         }
-        return population.fittestMember.chromosomes.toDoubleArray()
+        return population.fittestMember!!.chromosomes.toDoubleArray()
     }
 
     @Throws(Exception::class)

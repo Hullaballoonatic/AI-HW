@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import static agents.ExtensionsKt.getSFX;
@@ -271,5 +273,15 @@ public class View extends JFrame implements ActionListener {
 			if(++pos >= clips.length)
 				pos = 0;
 		}
+	}
+
+	InputStream getSFX(String filepath) throws FileNotFoundException {
+		InputStream streamA = AudioInputStream.class.getResourceAsStream(filepath);
+		InputStream streamB = Thread.currentThread().getContextClassLoader().getResourceAsStream(filepath);
+		if (streamA != null) {
+		    return streamA;
+		} else if (streamB != null) {
+            return streamB;
+		} else throw(new FileNotFoundException(filepath));
 	}
 }

@@ -1,56 +1,59 @@
 package agents
 
-import java.lang.Math.abs
-import java.util.Random
+import agents.Settings.NUM_SELECTIONS
+import java.lang.System.out
+import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
-class Population(val size: Int = 100) : Matrix(size, NUM_CHROMOSOMES) {
-    init {
-        this.map { chromosome -> chromosome.map { gene -> gene + 0.03 * rand.nextGaussian() } }
+class Population(val size: Int = 100) {
+    private val members = List(100) { Member() }.toMutableList()
+
+    private val randomMember
+        get() = members[rand.nextInt(members.size)]
+
+    val fittestMember
+        get() = members.maxBy { it.fitness }.also { out.println(it) }
+
+    fun selection(times: Int = NUM_SELECTIONS) = repeat(times) {
+        val battle = randomMember.battle(randomMember)
+        
+        members -= if (rand.chance(battle.winner.survivalRate)) battle.loser else battle.winner
     }
 
-    private val randomChromosomeIndex get() = rand.nextInt(rows())
-    private val randomChromosome get() = this.row(randomChromosomeIndex)
+    private fun Member.findMate() = List(numCandidateMates) { randomMember }.minBy { candidate -> candidate.similarityTo(this) }!!
 
-    fun select(times: Int = 1) = repeat(times) {
-        val red = randomChromosomeIndex
-        val blue = randomChromosomeIndex
-        if (Controller.doBattleNoGui(NeuralAgent(this.row(red)), NeuralAgent(this.row(blue))) == -1)
-            if (rand.playOdds(MetaParameters.KILL_ODDS)) this.removeRow(red) else this.removeRow(blue)
-        else
-            if (rand.playOdds(MetaParameters.KILL_ODDS)) this.removeRow(blue) else this.removeRow(red)
-    }
+    fun population(type: MatingType = MatingType.Crossover, d: Double = 0.5) {
+        while (members.size < size) {
+            val mother = randomMember
 
-    fun repopulate() {
-        while (rows() < size) {
-            mate()
+            members += Member().apply {
+                for (c in indices) {
+                    this[c] = when (type) {
+                        MatingType.Cloning -> mother[c]
+                        MatingType.Crossover -> {
+                            val father = mother.findMate()
+                            if (rand.nextBoolean()) mother[c] else father[c]
+                        }
+                        else -> {
+                            val father = mother.findMate()
+                            d * mother[c] + (1 - d) * father[c]
+                        }
+                    }
+                }
+            }
         }
     }
 
-    private fun DoubleArray.similarityTo(to: DoubleArray): Double = abs(this.sum() - to.sum())
-    /*
-    (3) For replenishing the population, please implement cross-over to produce new chromosomes that replace the dead ones.
-    Randomly choose the first parent. Randomly choose a few candidates for the other parent. Pick the one most similar to the first parent.
-    For each element in the child gene, randomly pick one of the two parents to supply its value.
-     */
-    private fun mate() {
-        val mother = randomChromosome
-        val father = List<DoubleArray>(MetaParameters.NUM_MATES) { randomChromosome }.asSequence()
-            .sortedBy { candidate -> candidate.similarityTo(mother) }
-            .first()
-        this.newRow().mapIndexed { n, _ -> if (rand.nextInt(2) == 0) mother[n] else father[n] }.toDoubleArray()
-    }
-
-    private fun DoubleArray.mutate(deviation: Double = MetaParameters.AVG_DEVIATION) {
-        this[rand.nextInt(NUM_CHROMOSOMES)] += deviation * rand.nextGaussian()
-    }
-
-    fun mutate(deviation: Double = MetaParameters.AVG_DEVIATION) {
-        this.map { member -> if (rand.playOdds(MetaParameters.MUTATION_ODDS)) member.mutate(deviation) }
-    }
+    fun mutation(catastrophic: Boolean = false) =
+        members.forEach {
+            if (catastrophic) it.mutate(300, 1.0) else it.mutate()
+        }
 
     companion object {
         val rand: Random get() = ThreadLocalRandom.current()
-        const val NUM_CHROMOSOMES = 291
     }
+}
+
+enum class MatingType {
+    Crossover, Cloning, Interpolation, Extrapolation
 }

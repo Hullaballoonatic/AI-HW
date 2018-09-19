@@ -20,15 +20,8 @@ fun getSFX(filename: String): InputStream {
         ?: throw FileNotFoundException(filepath)
 }
 
-fun Matrix.map(action: (DoubleArray) -> Unit) {
-    for (i in 0 until this.rows()) action(this.row(i))
-}
+fun Random.chance(chance: Double) = this.nextInt() < (chance * 100)
 
-fun Random.playOdds(odds: Pair<Int, Int>): Boolean {
-    val a = if (odds.first <= 0) 1 else odds.first
-    val b = if (odds.second <= 0) 1 else odds.second
-    return this.nextInt(b) in List(a) { it }
+operator fun List<Double>.set(it: Int, value: Double) {
+    this[it] = value
 }
-
-operator fun Pair<Int,Int>.plus(o: Pair<Int,Int>): Pair<Int,Int> = this.first + o.first to this.second * o.second
-operator fun Int.times(o: Pair<Int,Int>): Pair<Int,Int> = this * o.first to this * o.second

@@ -1,23 +1,23 @@
 package agents
-import agents.MetaParameters.NUM_TOURNAMENTS
+import agents.Settings.FITNESS_PER_NUM_GENERATIONS
+import agents.Settings.NUM_GENERATIONS
 
 internal object Game {
-    var score = 0
+    private val population = Population(size = 100)
+    private val fitnessOverTime = List(NUM_GENERATIONS / FITNESS_PER_NUM_GENERATIONS) { 0.0 }
 
     private fun evolveWeights(): DoubleArray {
-        // Create a random initial population
-
-        val population = Population(size = 100)
-        while (NUM_TOURNAMENTS >= 0) {
-            repeat(times = NUM_TOURNAMENTS) {
-                population.select()
-                population.repopulate()
-                population.mutate()
-            }
-            score += Controller.doBattleNoGui(ReflexAgent(), NeuralAgent(population.row(0)))
-            System.out.printf("\n-- score: $score\n")
+        fitnessOverTime.map {
+            population.apply {
+                repeat(FITNESS_PER_NUM_GENERATIONS) { i ->
+                    System.out.print(if(i%10==0)"!" else ".")
+                    selection()
+                    population()
+                    mutation()
+                }
+            }.fittestMember
         }
-        return population.row(0)
+        return population.fittestMember.chromosomes.toDoubleArray()
     }
 
     @Throws(Exception::class)
@@ -26,8 +26,3 @@ internal object Game {
         Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
     }
 }
-
-
-
-
-

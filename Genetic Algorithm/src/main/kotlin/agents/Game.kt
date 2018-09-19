@@ -1,29 +1,23 @@
 package agents
-import agents.Settings.FITNESS_PER_GEN_METRIC
+import agents.Settings.FITNESS_PER_NUM_GENERATIONS
 import agents.Settings.NUM_GENERATIONS
-import java.lang.System.out
 
 internal object Game {
+    private val population = Population(size = 100)
+    private val fitnessOverTime = List(NUM_GENERATIONS / FITNESS_PER_NUM_GENERATIONS) { 0.0 }
 
     private fun evolveWeights(): DoubleArray {
-        val population = Population(size = 100)
-        out.print(population)
-
-        val fitnessOverTime = List(NUM_GENERATIONS / FITNESS_PER_GEN_METRIC) { 0.0 }
-
-        fitnessOverTime.mapIndexed { i, _ ->
+        fitnessOverTime.map {
             population.apply {
-                repeat(FITNESS_PER_GEN_METRIC) { _ ->
-                    generation++
-                    out.print(population)
+                repeat(FITNESS_PER_NUM_GENERATIONS) { i ->
+                    System.out.print(if(i%10==0)"!" else ".")
                     selection()
                     population()
-                    mutation(fitnessOverTime[i - 2] == fitnessOverTime[i - 1])
+                    mutation()
                 }
-            }.bestFitness
+            }.fittestMember
         }
-
-        return population.row(0)
+        return population.fittestMember.chromosomes.toDoubleArray()
     }
 
     @Throws(Exception::class)

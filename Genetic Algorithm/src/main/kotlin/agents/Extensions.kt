@@ -22,8 +22,4 @@ fun getSFX(filename: String): InputStream {
 
 fun Random.chance(chance: Double) = this.nextInt() < (chance * 100)
 
-operator fun List<Double>.set(it: Int, value: Double) {
-    this[it] = value
-}
-
 fun doBattleNoGui(blue: Member, red: Member) = Controller.doBattleNoGui(NeuralAgent(blue.chromosomes.toDoubleArray()), NeuralAgent(red.chromosomes.toDoubleArray()))

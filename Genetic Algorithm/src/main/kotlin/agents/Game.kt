@@ -1,28 +1,26 @@
 package agents
-import agents.Settings.FITNESS_PER_NUM_GENERATIONS
 import agents.Settings.NUM_GENERATIONS
+import winningWeights
 
-internal object Game {
-    private val population = Population(size = 100)
-    private val fitnessOverTime = List(NUM_GENERATIONS / FITNESS_PER_NUM_GENERATIONS) { 0.0 }
+object Game {
+    private
+    val population = Population()
 
-    private fun evolveWeights(): DoubleArray {
-        fitnessOverTime.map {
+    private
+    fun evolveWeights() =
             population.apply {
-                repeat(FITNESS_PER_NUM_GENERATIONS) { i ->
-                    System.out.print(if(i%10==0)"!" else ".")
+                repeat(NUM_GENERATIONS) {
                     selection()
-                    population()
+                    repopulate()
                     mutation()
                 }
-            }.fittestMember
-        }
-        return population.fittestMember!!.chromosomes.toDoubleArray()
-    }
+            }.fittestOverTime.maxBy { it.fitness }!!.chromosomes.toDoubleArray()
 
     @Throws(Exception::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
+        //Controller.doBattle(ReflexAgent(), NeuralAgent(evolveWeights()))
+        //population.printFitnessOverTime()
+        Controller.doBattle(ReflexAgent(), NeuralAgent(winningWeights))
     }
 }

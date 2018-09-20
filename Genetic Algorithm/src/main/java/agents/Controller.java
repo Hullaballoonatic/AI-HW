@@ -153,7 +153,7 @@ class Controller implements MouseListener
 		Controller c = new Controller(ss, blue, red);
 		c.init();
 		c.view = new View(c, c.model, ss); // instantiates a JFrame, which spawns another thread to pump events and keeps the whole program running until the JFrame is closed
-		new Timer(20, c.view).start(); // creates an ActionEvent at regular intervals, which is handled by View.actionPerformed
+		new Timer(3, c.view).start(); // creates an ActionEvent at regular intervals, which is handled by View.actionPerformed
 	}
 
 	static long doBattleNoGui(IAgent blue, IAgent red) throws Exception {
@@ -162,10 +162,10 @@ class Controller implements MouseListener
 		c.init();
 		while(c.update()) { }
 		c.model.setPerspectiveBlue(c.secret_symbol);
-		if(c.model.getFlagEnergySelf() < 0.0f && c.model.getFlagEnergyOpponent() >= 0.0f)
-			return -1 * c.getIter();
-		else if(c.model.getFlagEnergyOpponent() < 0.0f && c.model.getFlagEnergySelf() >= 0.0f)
-			return c.getIter();
+		if(c.model.getFlagEnergySelf() < 0.0f && c.model.getFlagEnergyOpponent() >= 0.0f) {
+			return -c.getIter() / 100L;
+		} else if(c.model.getFlagEnergyOpponent() < 0.0f && c.model.getFlagEnergySelf() >= 0.0f)
+			return c.getIter() / 100L;
 		else
 			return 0;
 	}
@@ -178,63 +178,5 @@ class Controller implements MouseListener
 	String getRedName()
 	{
 		return redAgent.getClass().getName();
-	}
-
-	static int[] rankAgents(ArrayList<IAgent> agents, int[] wins, boolean verbose) throws Exception {
-
-		// Make every agent battle against every other agent
-		if(verbose)
-			System.out.println("\nBattles:");
-		int n = agents.size() * (agents.size() - 1);
-		for(int i = 0; i < agents.size(); i++) {
-			for(int j = 0; j < agents.size(); j++) {
-				if(j == i)
-					continue;
-				if(verbose)
-					System.out.print("	" + agents.get(i).getClass().getName() + " vs " + agents.get(j).getClass().getName() + ". Winner: ");
-				long outcome = Controller.doBattleNoGui(agents.get(i), agents.get(j));
-				if(outcome > 0) {
-					if(verbose)
-						System.out.println(agents.get(i).getClass().getName());
-					wins[i]++;
-				}
-				else if(outcome < 0) {
-					if(verbose)
-						System.out.println(agents.get(j).getClass().getName());
-					wins[j]++;
-				}
-				else {
-					if(verbose)
-						System.out.println("Tie");
-				}
-			}
-		}
-
-		// Sort the agents by wins (using insertion sort)
-		int[] agentIndexes = new int[agents.size()];
-		for(int i = 0; i < agents.size(); i++)
-			agentIndexes[i] = i;
-		for(int i = 1; i < agents.size(); i++) {
-			for(int j = i; j > 0; j--) {
-				if(wins[agentIndexes[j]] > wins[agentIndexes[j - 1]]) {
-					int t = agentIndexes[j];
-					agentIndexes[j] = agentIndexes[j - 1];
-					agentIndexes[j - 1] = t;
-				}
-				else
-					break;
-			}
-		}
-		return agentIndexes;
-	}
-
-	static void doTournament(ArrayList<IAgent> agents) throws Exception {
-		int[] wins = new int[agents.size()];
-		int[] agentIndexes = rankAgents(agents, wins, true);
-		System.out.println("\nRankings:");
-		for(int i = 0; i < agents.size(); i++) {
-			int a = agentIndexes[i];
-			System.out.println("	#" + Integer.toString(i + 1) + ". " + agents.get(a).getClass().getName() + " (" + Integer.toString(wins[a]) + " wins)");
-		}
 	}
 }

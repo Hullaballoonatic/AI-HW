@@ -274,14 +274,4 @@ public class View extends JFrame implements ActionListener {
 				pos = 0;
 		}
 	}
-
-	InputStream getSFX(String filepath) throws FileNotFoundException {
-		InputStream streamA = AudioInputStream.class.getResourceAsStream(filepath);
-		InputStream streamB = Thread.currentThread().getContextClassLoader().getResourceAsStream(filepath);
-		if (streamA != null) {
-		    return streamA;
-		} else if (streamB != null) {
-            return streamB;
-		} else throw(new FileNotFoundException(filepath));
-	}
 }

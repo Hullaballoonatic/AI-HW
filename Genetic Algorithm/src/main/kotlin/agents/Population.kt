@@ -1,38 +1,72 @@
 package agents
 
+import agents.Settings.NUM_GENERATIONS_PER_FITNESS
 import agents.Settings.NUM_SELECTIONS
+import java.lang.IndexOutOfBoundsException
 import java.lang.System.out
 import java.util.Random
 import java.util.concurrent.ThreadLocalRandom
 
-class Population(val size: Int = 100) {
+class Population(private val size: Int = 100) {
     private
-    val members = List(100) { Member() }.toMutableList()
+    var generation: Int = 1
+
+    private
+    val members = MutableList(size) { Member() }
 
     private
     val randomMember
-        get() = members[rand.nextInt(members.size)]
+        get() = this[rand.nextInt(members.size)]
 
-    val fittestMember
-        get() = members.maxBy { it.fitness }.also { out.println(it) }
+    private
+    val Member.preferredMate get() =
+        List(numCandidateMates) { randomMember }
+                .maxBy { it.similarityTo(this) }!!
 
-    fun selection(times: Int = NUM_SELECTIONS) =
-        repeat(times) {
-            randomMember.battle(randomMember).also { battle ->
-                members -= if (rand.chance(battle.winner.survivalRate)) battle.loser else battle.winner
-            }
+    private
+    val fitnessOverTime: ArrayList<Int> = ArrayList()
+
+    val fittestOverTime: ArrayList<Member> = ArrayList()
+
+    private
+    val selectionGen
+        get() = generation % NUM_GENERATIONS_PER_FITNESS == 0
+
+    private
+    val isStagnated: Boolean
+        get() {
+            if(fitnessOverTime.size < 8) return false
+            else for(i in 1..8) if(fitnessOverTime.last() != fitnessOverTime[fitnessOverTime.size - i]) return false
+            return true
         }
 
     private
-    fun Member.findMate() =
-        List(numCandidateMates) { randomMember }
-            .minBy { it.similarityTo(this) }!!
+    fun kill(member: Member) {
+        members -= member
+    }
 
-    fun population(type: MatingType = MatingType.Crossover, d: Double = 0.5) {
+    fun selection(times: Int = NUM_SELECTIONS) =
+        if (selectionGen) fitnessSelection()
+        else repeat(times) {
+            randomMember.battle(randomMember).also { result ->
+                if (result.winnerLives) kill(result.loser) else kill(result.winner)
+            }
+        }
+
+    @Suppress("NestedLambdaShadowedImplicitParameter")
+    private
+    fun fitnessSelection() {
+        members.sortByDescending { it.fitness }
+        fittestOverTime += members.first().also { out.println(it) }
+        fitnessOverTime += members.first().fitness
+
+        repeat(10) { kill(members.last()) }
+        repopulate(MatingType.Cloning, mother = members.first())
+    }
+
+    fun repopulate(type: MatingType = MatingType.Crossover, d: Double = 0.5, mother: Member = randomMember, father: Member = mother.preferredMate) {
+        generation++
         while (members.size < size) {
-            val mother = randomMember
-            val father = mother.findMate()
-
             members += Member { c ->
                 when (type) {
                     MatingType.Cloning       -> mother[c]
@@ -44,10 +78,17 @@ class Population(val size: Int = 100) {
         }
     }
 
-    fun mutation(catastrophic: Boolean = false) =
+    fun mutation(catastrophic: Boolean = isStagnated) =
         members.forEach {
             if (catastrophic) it.mutate(300, 1.0) else it.mutate()
         }
+
+    operator fun get(i: Int) = members[i]
+    operator fun set(i: Int, v: Member) { members[i] = v }
+
+    fun printFitnessOverTime() {
+        for(p in fitnessOverTime) out.println(p)
+    }
 
     enum class MatingType {
         Crossover, Cloning, Interpolation, Extrapolation;

@@ -12,13 +12,21 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-// SVG
+// note: SVG for chart
 
 class Member(val chromosomes: MutableList<Double> = MutableList(NUM_CHROMOSOMES) { 0.03 * rand.nextGaussian() }) {
     constructor(init: (index: Int) -> Double) : this(MutableList(NUM_CHROMOSOMES) { init(it) }) {
         for (i in NUM_CHROMOSOMES until NUM_MUTABLE_ATTRIBUTES)
             this[i] = init(i)
     }
+
+    private
+    val randomChromosome
+        get() = rand.nextInt(NUM_CHROMOSOMES + 4)
+
+    private
+    val mutation
+        get() = mutationStdDev * rand.nextGaussian()
 
     val fitness: Int
         get() {
@@ -45,11 +53,11 @@ class Member(val chromosomes: MutableList<Double> = MutableList(NUM_CHROMOSOMES)
     fun battle(opponent: Member): BattleResult =
             if (doBattleNoGui(this, opponent) > 0) BattleResult(this, opponent) else BattleResult(opponent, this)
 
-    fun mutate(numEvents: Int = 10, rate: Double = mutationRate) {
-        repeat(numEvents) {
-            if (rand.chance(rate)) this[rand.nextInt(NUM_CHROMOSOMES + 4)] += mutationStdDev * rand.nextGaussian()
+    fun mutate(numPotentialMutations: Int = 10, mutationRate: Double = this.mutationRate) =
+        repeat(numPotentialMutations) {
+            if (mutationRate.procs)
+                this[randomChromosome] += mutation
         }
-    }
 
     operator fun get(c: Int) =
         when (c) {
@@ -72,6 +80,12 @@ class Member(val chromosomes: MutableList<Double> = MutableList(NUM_CHROMOSOMES)
     companion object {
         val rand = Random()
         const val NUM_MUTABLE_ATTRIBUTES = NUM_CHROMOSOMES + 4
+    }
+
+    fun printWeights() {
+        out.println("\nWEIGHTS PRINTOUT FOR MEMBER" +
+                    "\n---------------------------")
+        for(weight in chromosomes) out.println(weight)
     }
 
     override fun toString(): String =

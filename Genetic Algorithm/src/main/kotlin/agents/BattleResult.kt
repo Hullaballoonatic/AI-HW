@@ -4,7 +4,7 @@ import java.util.*
 
 data class BattleResult(val winner: Member, val loser: Member) {
     val winnerLives
-        get() = rand.chance(winner.survivalRate)
+        get() = winner.survivalRate.procs
 
     companion object {
         val rand = Random()

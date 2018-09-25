@@ -20,6 +20,10 @@ fun getSFX(filename: String): InputStream {
         ?: throw FileNotFoundException(filepath)
 }
 
+val rand = Random()
+
+val Double.procs get() = rand.nextInt(100) < this * 100
+
 fun Random.chance(chance: Double) = this.nextInt() < (chance * 100)
 
 fun doBattleNoGui(blue: Member, red: Member) = Controller.doBattleNoGui(NeuralAgent(blue.chromosomes.toDoubleArray()), NeuralAgent(red.chromosomes.toDoubleArray()))

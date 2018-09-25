@@ -87,6 +87,8 @@ class Population(private val size: Int = 100) {
     operator fun set(i: Int, v: Member) { members[i] = v }
 
     fun printFitnessOverTime() {
+        out.println("\nHIGHEST FITNESS FOR A MEMBER PER THREE GENERATIONS" +
+                    "\n--------------------------------------------------")
         for(p in fitnessOverTime) out.println(p)
     }
 

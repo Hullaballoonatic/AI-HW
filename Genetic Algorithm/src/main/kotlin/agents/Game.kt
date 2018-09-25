@@ -14,7 +14,9 @@ object Game {
                     repopulate()
                     mutation()
                 }
-            }.fittestOverTime.maxBy { it.fitness }!!.chromosomes.toDoubleArray()
+            }.fittestOverTime
+                    .maxBy { it.fitness }!!
+                    .also{ it.printWeights() }.chromosomes.toDoubleArray()
 
     @Throws(Exception::class)
     @JvmStatic

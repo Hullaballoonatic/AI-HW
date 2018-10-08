@@ -1,240 +1,75 @@
 package view.ticTacToe
 
+import controller.ticTacToe.TicTacToeAgent
 import controller.ticTacToe.TicTacToeController
-import model.Player
+import model.Position
 import tornadofx.*
 
 class TicTacToeView : View() {
-    private val c: TicTacToeController by inject()
+    private val c = TicTacToeController()
 
+    override val root = borderpane {
+        top = ConsoleView(c).root
+        bottom = vbox {
+            prefHeight = 120.0
+            prefWidth = 100.0
+            usePrefHeight
+            usePrefWidth
+            button("player") {
+                prefWidth = 80.0
+                usePrefWidth
+                action {
+                    replaceWith(TicTacToeBoard(c))
+                }
+            }
+            button("bot") {
+                prefWidth = 80.0
+                usePrefWidth
+                action {
+                    c.agent = TicTacToeAgent(c)
+                    replaceWith(TicTacToeBoard(c))
+                }
+            }
+        }
+    }
+}
+
+class TicTacToeBoard(private val c: TicTacToeController) : View() {
     init {
-        c.startGame()
+        c.start()
     }
 
-    override val root = gridpane {
-        button {
-            val here = c.board[0]
+    override val root = borderpane {
+        top = ConsoleView(c).root
 
-            text = "1"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
+        bottom = gridpane {
+            c.board.positions.forEach { pos: Position ->
+                button(pos.label) {
+                    prefHeight = 30.0
+                    prefWidth = 30.0
+                    usePrefHeight = true
+                    usePrefWidth = true
 
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
+                    gridpaneConstraints {
+                        columnRowIndex(pos.col, pos.row)
+                        marginLeftRight(1.0)
+                        marginTopBottom(1.0)
+                    }
 
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
+                    action {
+                        if (!c.playerLock && pos.isActionable) {
+                            c.board.placeToken(pos)
+                            c.update()
+                        }
+                    }
                 }
             }
         }
+    }
+}
 
-        button {
-            val here = c.board[1]
-
-            text = "2"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[2]
-
-            text = "3"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[3]
-
-            text = "4"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[4]
-
-            text = "5"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[5]
-
-            text = "6"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[6]
-
-            text = "7"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[7]
-
-            text = "8"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
-
-        button {
-            val here = c.board[8]
-
-            text = "9"
-            textFill = Player.NONE.color
-            prefHeight = 30.0
-            prefWidth = 30.0
-            usePrefHeight = true
-            usePrefWidth = true
-
-            gridpaneConstraints {
-                columnRowIndex(here.y, here.x)
-                marginTopBottom(1.0)
-                marginLeftRight(1.0)
-            }
-
-            action {
-                if (c.curPlayer.placeToken(here)) {
-                    text = here.label
-                    textFill = here.color
-                    c.nextPlayer()
-                }
-            }
-        }
+class ConsoleView(private val c: TicTacToeController) : View() {
+    override val root = vbox {
+        label(c.statusProperty)
     }
 }

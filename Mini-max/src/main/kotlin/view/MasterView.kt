@@ -5,18 +5,15 @@ import view.ticTacToe.TicTacToeView
 
 class MasterView : View() {
     override val root = vbox {
-        prefHeight = 100.0
+        prefHeight = 160.0
         usePrefHeight = true
 
-        label("Choose a ticTacToe to play")
+        label("Choose a game to play")
         button("TicTacToe") {
             action {
                 replaceWith(TicTacToeView::class)
             }
         }
     }
-
-    override fun onDock() {
-
-    }
 }
+

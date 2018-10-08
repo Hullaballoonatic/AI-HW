@@ -1,25 +1,19 @@
 package model.ticTacToe
 
 import model.Player
+import model.Position
+import tornadofx.*
 
-class Line(vararg positionIndices: Int) {
+class Line(vararg positionIndices: Int) : ViewModel() {
     private val positionIndices = positionIndices.asList()
 
-    private val linePositions get() =
-        positionIndices.map { boardPositions[it] }
-
-    val winner: Player? get() =
-        linePositions[0].owner.run {
-            if (this != Player.NONE && linePositions.none { it.owner != this }) this else null
+    var winner: Player? = null
+    fun winner(boardPositions: List<Position>): Player? =
+        positionIndices.map { boardPositions[it] }.run {
+            val firstOwner = this[0].owner
+            if (firstOwner != Player.NONE && none { it.owner != firstOwner }) {
+                winner = firstOwner
+                firstOwner
+            } else null
         }
-
-    val hasWinner
-        get() = winner != null
-
-    companion object {
-        lateinit var m: TicTacToe
-        val boardPositions get() = m.positions
-    }
-
-
 }

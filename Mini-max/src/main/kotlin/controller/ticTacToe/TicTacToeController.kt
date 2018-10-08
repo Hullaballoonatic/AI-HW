@@ -1,40 +1,36 @@
 package controller.ticTacToe
 
-import controller.Agent
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import model.Player
 import model.ticTacToe.TicTacToe
 import tornadofx.*
-import java.lang.System.out
 
-class TicTacToeController : Controller() {
+class TicTacToeController {
     val board = TicTacToe()
-    var curPlayer: Player = Player.X
+    var agent: TicTacToeAgent? = null
 
-    private val agentProperty = SimpleObjectProperty<Agent<TicTacToeController>?>(null)
-    var agent by agentProperty
+    var robotLock = true
+    var playerLock = false
 
-    fun startGame(numPlayers: Int = 2) { //TODO: add ability to change number of users
-        when {
-            numPlayers > 2 -> throw(Exception("too many players"))
-            numPlayers < 1 -> throw(Exception("too few players"))
-            numPlayers == 1 -> agent = TicTacToeAgent(this, Player.O)
-        }
-        nextPlayer()
+    val statusProperty = SimpleStringProperty("choose your opponent")
+    var status: String by statusProperty
+
+    fun start() {
+        if (agent != null) board.placeToken(board.actionablePositions.first())
+        update()
     }
 
-    fun nextPlayer() {
-        board.winner?.let {
-            out.println("winner = $curPlayer") //TODO: highlight winning line
-            curPlayer = Player.NONE
-        }
+    fun update() {
+        status = board.winner?.let { winner ->
+            when(winner) {
+                Player.NONE -> "tie!"
+                else        -> "${board.lastPlayer} wins!"
+            }
+        } ?: "${board.curPlayer}'s turn"
 
-        curPlayer = when(curPlayer) {
-            Player.X -> Player.O
-            Player.O -> Player.X
-            else     -> Player.NONE
+        if(agent != null) {
+            agent?.action()
+            robotLock = !robotLock
         }
-
-        agent?.action()
     }
 }

@@ -1,14 +1,19 @@
 package controller.ticTacToe
 
-import controller.Agent
 import model.Player
 
-class TicTacToeAgent(override val controller: TicTacToeController, override val player: Player): Agent<TicTacToeController> {
-    override fun action() {
-        if(controller.curPlayer == player) {
-            //TODO: Determine action using Minimax
+class TicTacToeAgent(private val controller: TicTacToeController) {
+    private val game = controller.board
 
-            controller.nextPlayer()
+    fun action() {
+        if (game.curPlayer == Player.X && !controller.robotLock) {
+            controller.playerLock = true
+
+            game.placeToken(Minimax(game).execute())
+
+            controller.playerLock = false
+
+            controller.update()
         }
     }
 }

@@ -2,19 +2,51 @@ package model.ticTacToe
 
 import model.Board
 import model.Player
+import model.Position
+import java.lang.System.out
 
-class TicTacToe private constructor(): Board {
-    override val positions = listOf(
-        Position(0, 0), Position(0, 1), Position(0, 2),
-        Position(1, 0), Position(1, 1), Position(1, 2),
-        Position(2, 0), Position(2, 1), Position(2, 2))
+class TicTacToe (override val positions: List<Position> = List(9) { Position(it+1) }, curPlayer: Player = Player.X
+): Board {
+    constructor(state: TicTacToe): this(state.positions.map { Position(it.number, it.owner) }, state.curPlayer)
+
+    init {
+        out.println(this.toString())
+    }
+
+    var lastPlayer: Player = Player.NONE
+    var curPlayer: Player = curPlayer
+        get() = if (isEnded) Player.NONE else field
+        set(v) {
+            lastPlayer = field
+            field = v
+        }
+
+    fun placeToken(at: Position) {
+        if (at.isActionable) {
+            this[at]?.owner = curPlayer
+
+            curPlayer = when (curPlayer) {
+                Player.X -> Player.O
+                Player.O -> Player.X
+                else     -> Player.NONE
+            }
+        }
+    }
+
+    val score get() = when(winner) {
+        Player.X -> 10
+        Player.O -> -10
+        else -> 0
+    }
 
     override
     val winner: Player?
-        get() = winningLine?.winner
+        get() = winningLine?.winner ?: if(positions.none { it.owner == Player.NONE }) Player.NONE else null
 
     var winningLine: Line? = null
-        get() = field ?: winnableLines.firstOrNull { it.hasWinner }
+        get() = field ?: winnableLines.firstOrNull { it.winner(positions) != null }
+
+    val actionablePositions get() = positions.filter { it.isActionable }
 
     private val winnableLines = listOf(
         Line(0, 1, 2), // horizontal top
@@ -27,7 +59,7 @@ class TicTacToe private constructor(): Board {
         Line(2, 4, 6)  // forward diagonal
     )
 
-    companion object {
-        operator fun invoke() = TicTacToe().apply { Line.m = this }
-    }
+    override fun toString() = "${positions[0]} ${positions[1]} ${positions[2]} \n" +
+                              "${positions[3]} ${positions[4]} ${positions[5]} \n" +
+                              "${positions[6]} ${positions[7]} ${positions[8]} \n"
 }

@@ -1,20 +1,23 @@
 package chess
 
-import agent.Agent
+import player.Human
+import player.Player
 import java.lang.System.out
+import player.PlayerColor.WHITE
+import player.PlayerColor.BLACK
 
-class Controller(private val light: Player, private val dark: Player, private val state: ChessState) {
+class Controller(private val light: Player, private val dark: Player, val state: State) {
     private val hasTwoHumans = light is Human && dark is Human
     private var turnCounter: Int = 0
 
-    private var lastPlayerColor = PlayerColor.WHITE
+    private var lastPlayerColor = WHITE
     private val nextPlayer get() = when(lastPlayerColor) {
-        PlayerColor.WHITE -> {
-            lastPlayerColor = PlayerColor.BLACK
+        WHITE -> {
+            lastPlayerColor = BLACK
             dark
         }
-        PlayerColor.BLACK -> {
-            lastPlayerColor = PlayerColor.WHITE
+        BLACK -> {
+            lastPlayerColor = WHITE
             light
         }
     }
@@ -29,14 +32,9 @@ class Controller(private val light: Player, private val dark: Player, private va
 
     companion object {
         @JvmStatic fun main(args: Array<String>) {
-            val game = ChessState()
-            val (light, dark) = args.map { it.toInt() }.zip(listOf(PlayerColor.WHITE, PlayerColor.BLACK)).map {
-                when (it.first) {
-                    0 -> Human(game, it.second)
-                    else -> Agent(game, it.second, it.first)
-                }
-            }
-            Controller(light, dark, game).callNextPlayer()
+            val game = State()
+            val (arg0, arg1) = if (args.size == 2) args.map { it.toInt() } else listOf(5, 8)
+            Controller(Player(game, WHITE, arg0), Player(game, BLACK, arg1), game).callNextPlayer()
         }
     }
 }

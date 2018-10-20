@@ -1,4 +1,4 @@
-package chess
+package player
 
 enum class PlayerColor {
     BLACK {

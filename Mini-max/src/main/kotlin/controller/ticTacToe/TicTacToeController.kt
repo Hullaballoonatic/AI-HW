@@ -1,9 +1,7 @@
 package controller.ticTacToe
 
-import javafx.beans.property.SimpleStringProperty
 import model.Player
 import model.ticTacToe.TicTacToe
-import tornadofx.*
 
 class TicTacToeController {
     val board = TicTacToe()

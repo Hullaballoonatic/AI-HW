@@ -1,59 +1,60 @@
 package chess;
 
-import player.PlayerColor;
-
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
 
 /// Represents the state of a chess game
 public class State {
-    private static final Random rand = new Random();
+    public static final int MAX_PIECE_MOVES = 27;
+    public static final int None = 0;
+    public static final int Pawn = 1;
+    public static final int Rook = 2;
+    public static final int Knight = 3;
+    public static final int Bishop = 4;
+    public static final int Queen = 5;
+    public static final int King = 6;
+    public static final int PieceMask = 7;
+    public static final int WhiteMask = 8;
+    public static final int AllMask = 15;
 
-    private static final int None = 0;
-    private static final int Pawn = 1;
-    private static final int Rook = 2;
-    private static final int Knight = 3;
-    private static final int Bishop = 4;
-    private static final int Queen = 5;
-    private static final int King = 6;
-    private static final int PieceMask = 7;
-    private static final int WhiteMask = 8;
-    private static final int AllMask = 15;
+    int[] m_rows;
 
-    private int[] m_rows;
-
-    State() {
+    public State() {
         m_rows = new int[8];
         resetBoard();
     }
-    
-    public State(State that, Move move) {
-        State nextState = new State(that);
-        nextState.move(move.xSource, move.ySource, move.xDest, move.yDest);
-    }
 
-    private State(State that) {
+    public State(State that) {
         m_rows = new int[8];
-        System.arraycopy(that.m_rows, 0, this.m_rows, 0, 8);
+        for(int i = 0; i < 8; i++)
+            this.m_rows[i] = that.m_rows[i];
     }
 
-    private int getPiece(int col, int row) {
+    public State(State copy, ChessMove move) {
+        m_rows = new int[8];
+        for(int i = 0; i < 8; i++)
+            this.m_rows[i] = copy.m_rows[i];
+        move(move);
+    }
+
+    int getPiece(int col, int row) {
         return (m_rows[row] >> (4 * col)) & PieceMask;
     }
 
-    private boolean isWhite(int col, int row) {
-        return (m_rows[row] >> 4 * col & WhiteMask) > 0;
+    public boolean isWhite(int col, int row) {
+        return (((m_rows[row] >> (4 * col)) & WhiteMask) > 0 ? true : false);
     }
 
     /// Sets the piece at location (col, row). If piece is None, then it doesn't
     /// matter what the value of white is.
-    private void setPiece(int col, int row, int piece, boolean white) {
+    void setPiece(int col, int row, int piece, boolean white) {
         m_rows[row] &= (~(AllMask << (4 * col)));
         m_rows[row] |= ((piece | (white ? WhiteMask : 0)) << (4 * col));
     }
 
     /// Sets up the board for a new game
-    private void resetBoard() {
+    void resetBoard() {
         setPiece(0, 0, Rook, true);
         setPiece(1, 0, Knight, true);
         setPiece(2, 0, Bishop, true);
@@ -81,7 +82,7 @@ public class State {
     }
 
     /// Positive means white is favored. Negative means black is favored.
-    public int heuristic()
+    public int heuristic(Random rand)
     {
         int score = 0;
         for(int y = 0; y < 8; y++)
@@ -111,80 +112,81 @@ public class State {
     }
 
     /// Returns an iterator that iterates over all possible moves for the specified color
-    public MoveIterator iterator(PlayerColor color) {
-        return new MoveIterator(this, color == PlayerColor.WHITE);
+    public ChessMoveIterator iterator(boolean white) {
+        return new ChessMoveIterator(this, white);
     }
 
     /// Returns true iff the parameters represent a valid move
-    boolean isValidMove(int xSrc, int ySrc, int xDest, int yDest) {
+    public boolean isValidMove(int xSrc, int ySrc, int xDest, int yDest) {
         ArrayList<Integer> possible_moves = moves(xSrc, ySrc);
         for(int i = 0; i < possible_moves.size(); i += 2) {
-            if(possible_moves.get(i) == xDest && possible_moves.get(i + 1) == yDest)
+            if(possible_moves.get(i).intValue() == xDest && possible_moves.get(i + 1).intValue() == yDest)
                 return true;
         }
         return false;
     }
 
-    /// Print a representation of the board to the specified System.out
-    void printBoard()
+    /// Print a representation of the board to the specified stream
+    public void printBoard(PrintStream stream)
     {
-        System.out.println("  A  B  C  D  E  F  G  H");
-        System.out.print(" +");
+        stream.println("  A  B  C  D  E  F  G  H");
+        stream.print(" +");
         for(int i = 0; i < 8; i++)
-            System.out.print("--+");
-        System.out.println();
+            stream.print("--+");
+        stream.println();
         for(int j = 7; j >= 0; j--) {
-            System.out.print(Character.toString((char)(49 + j)));
-            System.out.print("|");
+            stream.print(Character.toString((char)(49 + j)));
+            stream.print("|");
             for(int i = 0; i < 8; i++) {
                 int p = getPiece(i, j);
                 if(p != None) {
                     if(isWhite(i, j))
-                        System.out.print("w");
+                        stream.print("w");
                     else
-                        System.out.print("b");
+                        stream.print("b");
                 }
                 switch(p) {
-                    case None: System.out.print("  "); break;
-                    case Pawn: System.out.print("p"); break;
-                    case Rook: System.out.print("r"); break;
-                    case Knight: System.out.print("n"); break;
-                    case Bishop: System.out.print("b"); break;
-                    case Queen: System.out.print("q"); break;
-                    case King: System.out.print("K"); break;
-                    default: System.out.print("?"); break;
+                    case None: stream.print("  "); break;
+                    case Pawn: stream.print("p"); break;
+                    case Rook: stream.print("r"); break;
+                    case Knight: stream.print("n"); break;
+                    case Bishop: stream.print("b"); break;
+                    case Queen: stream.print("q"); break;
+                    case King: stream.print("K"); break;
+                    default: stream.print("?"); break;
                 }
-                System.out.print("|");
+                stream.print("|");
             }
-            System.out.print(Character.toString((char)(49 + j)));
-            System.out.print("\n +");
+            stream.print(Character.toString((char)(49 + j)));
+            stream.print("\n +");
             for(int i = 0; i < 8; i++)
-                System.out.print("--+");
-            System.out.println();
+                stream.print("--+");
+            stream.println();
         }
-        System.out.println("  A  B  C  D  E  F  G  H");
+        stream.println("  A  B  C  D  E  F  G  H");
     }
 
     /// Pass in the coordinates of a square with a piece on it
     /// and it will return the places that piece can move to.
-    private ArrayList<Integer> moves(int col, int row) {
-        ArrayList<Integer> pOutMoves = new ArrayList<>();
+    ArrayList<Integer> moves(int col, int row) {
+        ArrayList<Integer> pOutMoves = new ArrayList<Integer>();
         int p = getPiece(col, row);
         boolean bWhite = isWhite(col, row);
+        int nMoves = 0;
         int i, j;
         switch(p) {
             case Pawn:
                 if(bWhite) {
-                    if(!checkPawnMove(pOutMoves, col, inc(row), false, true) && row == 1)
-                        checkPawnMove(pOutMoves, col, inc(inc(row)), false, true);
-                    checkPawnMove(pOutMoves, inc(col), inc(row), true, true);
-                    checkPawnMove(pOutMoves, dec(col), inc(row), true, true);
+                    if(!checkPawnMove(pOutMoves, col, inc(row), false, bWhite) && row == 1)
+                        checkPawnMove(pOutMoves, col, inc(inc(row)), false, bWhite);
+                    checkPawnMove(pOutMoves, inc(col), inc(row), true, bWhite);
+                    checkPawnMove(pOutMoves, dec(col), inc(row), true, bWhite);
                 }
                 else {
-                    if(!checkPawnMove(pOutMoves, col, dec(row), false, false) && row == 6)
-                        checkPawnMove(pOutMoves, col, dec(dec(row)), false, false);
-                    checkPawnMove(pOutMoves, inc(col), dec(row), true, false);
-                    checkPawnMove(pOutMoves, dec(col), dec(row), true, false);
+                    if(!checkPawnMove(pOutMoves, col, dec(row), false, bWhite) && row == 6)
+                        checkPawnMove(pOutMoves, col, dec(dec(row)), false, bWhite);
+                    checkPawnMove(pOutMoves, inc(col), dec(row), true, bWhite);
+                    checkPawnMove(pOutMoves, dec(col), dec(row), true, bWhite);
                 }
                 break;
             case Bishop:
@@ -267,10 +269,9 @@ public class State {
         return pOutMoves;
     }
 
-    public boolean move(Move move) {
+    public boolean move(ChessMove move) {
         return move(move.xSource, move.ySource, move.xDest, move.yDest);
     }
-
     /// Moves the piece from (xSrc, ySrc) to (xDest, yDest). If this move
     /// gets a pawn across the board, it becomes a queen. If this move
     /// takes a king, then it will remove all pieces of the same color as
@@ -311,19 +312,19 @@ public class State {
         return false;
     }
 
-    private static int inc(int pos) {
+    static int inc(int pos) {
         if(pos < 0 || pos >= 7)
             return -1;
         return pos + 1;
     }
 
-    private static int dec(int pos) {
+    static int dec(int pos) {
         if(pos < 1)
             return -1;
         return pos -1;
     }
 
-    private boolean checkMove(ArrayList<Integer> pOutMoves, int col, int row, boolean bWhite) {
+    boolean checkMove(ArrayList<Integer> pOutMoves, int col, int row, boolean bWhite) {
         if(col < 0 || row < 0)
             return true;
         int p = getPiece(col, row);
@@ -334,7 +335,7 @@ public class State {
         return (p > 0);
     }
 
-    private boolean checkPawnMove(ArrayList<Integer> pOutMoves, int col, int row, boolean bDiagonal, boolean bWhite) {
+    boolean checkPawnMove(ArrayList<Integer> pOutMoves, int col, int row, boolean bDiagonal, boolean bWhite) {
         if(col < 0 || row < 0)
             return true;
         int p = getPiece(col, row);
@@ -352,15 +353,19 @@ public class State {
     }
 
     /// Represents a possible  move
-    public static class Move {
+    public static class ChessMove {
         int xSource;
         int ySource;
         int xDest;
         int yDest;
+
+        @Override public String toString() {
+            return String.format("(%d, %d) -> (%d, %d)", xSource, ySource, xDest, yDest);
+        }
     }
 
     /// Iterates through all the possible moves for the specified color.
-    public static class MoveIterator
+    public static class ChessMoveIterator
     {
         int x, y;
         ArrayList<Integer> moves;
@@ -368,7 +373,7 @@ public class State {
         boolean white;
 
         /// Constructs a move iterator
-        private MoveIterator(State curState, boolean whiteMoves) {
+        ChessMoveIterator(State curState, boolean whiteMoves) {
             x = -1;
             y = 0;
             moves = null;
@@ -402,8 +407,8 @@ public class State {
         }
 
         /// Returns the next move
-        public Move next() {
-            Move m = new Move();
+        public State.ChessMove next() {
+            State.ChessMove m = new State.ChessMove();
             m.xSource = x;
             m.ySource = y;
             m.xDest = moves.get(moves.size() - 2);
@@ -413,5 +418,3 @@ public class State {
         }
     }
 }
-
-

@@ -1,7 +1,5 @@
 package model
 
-import javafx.beans.property.SimpleStringProperty
-
 class Position(val number: Int, owner: Player = Player.NONE) {
     var owner = owner
         set(v) {

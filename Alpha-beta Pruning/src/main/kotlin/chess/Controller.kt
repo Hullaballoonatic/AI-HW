@@ -32,7 +32,7 @@ class Controller(private val light: Player, private val dark: Player, val state:
     companion object {
         @JvmStatic fun main(args: Array<String>) {
             val game = State()
-            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(0, 0)
+            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(0, 4)
 
             Controller(
                 light = Player(game, WHITE, depthLight),

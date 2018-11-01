@@ -20,8 +20,7 @@ class Intelligence(private val state: State, private val color: PlayerColor,
         else -> toString()
     }
 
-    val bestMove: State.ChessMove
-        get() {
+    fun bestMove(): State.ChessMove {
             print("${toString()} is thinking")
             val it = state.iterator(isWhite)
 
@@ -33,7 +32,7 @@ class Intelligence(private val state: State, private val color: PlayerColor,
             while (it.hasNext()) {
                 print(".")
                 val move = it.next()
-                val score = prune(State(state, move), !isWhite)
+                val score = abPruning(State(state, move), !isWhite)
                 //print("%3s, ".format(score.scoreFormat))
                 if (isWhite) {
                     if (score >= bestScore) {
@@ -55,8 +54,8 @@ class Intelligence(private val state: State, private val color: PlayerColor,
             return bestMove ?: throw RuntimeException("$color failed to find a viable move")
         }
 
-    private fun prune(state: State, isMaximizing: Boolean, depth: Int = intelligenceLevel, a: Int = MIN,
-                      b: Int = MAX): Int {
+    private fun abPruning(state: State, isMaximizing: Boolean, depth: Int = intelligenceLevel, a: Int = MIN,
+                          b: Int = MAX): Int {
         //state.printBoard(System.out)
 
         var alpha = a
@@ -69,7 +68,7 @@ class Intelligence(private val state: State, private val color: PlayerColor,
             isMaximizing -> {
                 var value = MIN
                 while (it.hasNext() && alpha < beta) {
-                    value = max(value, prune(State(state, it.next()), false, depth - 1, alpha, beta))
+                    value = max(value, abPruning(State(state, it.next()), false, depth - 1, alpha, beta))
                     alpha = max(alpha, value)
                 }
                 value
@@ -77,7 +76,7 @@ class Intelligence(private val state: State, private val color: PlayerColor,
             else         -> {
                 var value = MAX
                 while (it.hasNext() && alpha < beta) {
-                    value = min(value, prune(State(state, it.next()), true, depth - 1, alpha, beta))
+                    value = min(value, abPruning(State(state, it.next()), true, depth - 1, alpha, beta))
                     beta = min(beta, value)
                 }
                 value

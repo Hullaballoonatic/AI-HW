@@ -27,14 +27,12 @@ public class State {
 
     public State(State that) {
         m_rows = new int[8];
-        for(int i = 0; i < 8; i++)
-            this.m_rows[i] = that.m_rows[i];
+        System.arraycopy(that.m_rows, 0, this.m_rows, 0, 8);
     }
 
     public State(State copy, ChessMove move) {
         m_rows = new int[8];
-        for(int i = 0; i < 8; i++)
-            this.m_rows[i] = copy.m_rows[i];
+        System.arraycopy(copy.m_rows, 0, this.m_rows, 0, 8);
         move(move);
     }
 
@@ -43,7 +41,7 @@ public class State {
     }
 
     public boolean isWhite(int col, int row) {
-        return (((m_rows[row] >> (4 * col)) & WhiteMask) > 0 ? true : false);
+        return (((m_rows[row] >> (4 * col)) & WhiteMask) > 0);
     }
 
     /// Sets the piece at location (col, row). If piece is None, then it doesn't
@@ -108,7 +106,7 @@ public class State {
                     score -= value;
             }
         }
-        return score + rand.nextInt(3) - 1;
+        return score + rand.nextInt(6) - 1;
     }
 
     /// Returns an iterator that iterates over all possible moves for the specified color

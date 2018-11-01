@@ -8,14 +8,8 @@ class Controller(private val light: Player, private val dark: Player, val state:
 
     private var lastPlayerColor = BLACK
     private val nextPlayer get() = when(lastPlayerColor) {
-        WHITE -> {
-            lastPlayerColor = BLACK
-            dark
-        }
-        BLACK -> {
-            lastPlayerColor = WHITE
-            light
-        }
+        WHITE -> dark.also { lastPlayerColor = BLACK }
+        BLACK -> light.also { lastPlayerColor = WHITE }
     }
 
     fun callNextPlayer() {
@@ -32,7 +26,7 @@ class Controller(private val light: Player, private val dark: Player, val state:
     companion object {
         @JvmStatic fun main(args: Array<String>) {
             val game = State()
-            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(0, 0)
+            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(3, 1)
 
             Controller(
                 light = Player(game, WHITE, depthLight),

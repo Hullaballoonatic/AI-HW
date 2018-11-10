@@ -1,0 +1,3 @@
+package forest
+
+interface Node

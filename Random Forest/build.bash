@@ -1,6 +1,4 @@
 #!/bin/bash
 set -e -v
 echo "Compiling..."
-javac *.java
-echo "Running..."
-java Main
+./gradlew build

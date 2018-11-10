@@ -6,7 +6,7 @@ plugins {
 
 group 'AI-HW'
 version '1.0-SNAPSHOT'
-mainClassName = "forest.Main"
+mainClassName = "model.Main"
 
 sourceCompatibility = 1.8
 

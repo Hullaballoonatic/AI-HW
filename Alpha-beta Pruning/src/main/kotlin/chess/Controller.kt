@@ -5,7 +5,6 @@ import player.PlayerColor.WHITE
 import player.PlayerColor.BLACK
 
 class Controller(private val light: Player, private val dark: Player, val state: State) {
-
     private var lastPlayerColor = BLACK
     private val nextPlayer get() = when(lastPlayerColor) {
         WHITE -> dark.also { lastPlayerColor = BLACK }
@@ -26,11 +25,9 @@ class Controller(private val light: Player, private val dark: Player, val state:
     companion object {
         @JvmStatic fun main(args: Array<String>) {
             val game = State()
-<<<<<<< HEAD
-            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(3, 1)
-=======
-            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(0, 4)
->>>>>>> 9b46db6e29a3c03839e7c44149d68eb2f5c4a155
+            val (depthLight, depthDark) = if (args.size == 2) args.map { it.toInt() } else listOf(3, 4)
+
+            println("Players:\nWHITE: ${if(depthLight == 0) "Human" else "BOT$depthLight"}\nBLACK ${if(depthDark == 0) "Human" else "BOT$depthDark"}")
 
             Controller(
                 light = Player(game, WHITE, depthLight),

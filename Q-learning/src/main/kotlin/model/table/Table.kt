@@ -1,33 +1,33 @@
 package model.table
 
-import model.table.TableMajor.*
-
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class Table<T>(val numRows: Int, val numCols: Int, private val major: TableMajor = ROW) {
-    lateinit var data: List<T>
+class Table<T>(val numRows: Int, val numCols: Int) : Iterable<T> {
+    override fun iterator() = data.flatten().iterator()
 
-    val cols get() = List(numCols) { x -> List(numRows) { y -> get(x, y) } }
-    val rows get() = List(numRows) { y -> List(numCols) { x -> get(x, y) } }
+    lateinit var data: List<List<T>>
 
     operator fun get(pos: Pos) = get(pos.x, pos.y)
-    operator fun get(x: Int, y: Int) = when(major) {
-        ROW    -> data[y * numCols + x]
-        COLUMN -> data[x * numRows + y]
-    }
+    operator fun get(x: Int, y: Int) = data[y][x]
 
-    fun forEach(action: (T) -> Unit) {
-        for (element in data) action(element)
+    override fun toString(): String {
+        val tableString = StringBuilder()
+        var vectorString: StringBuilder
+        data.forEach { row ->
+            vectorString = StringBuilder()
+            row.forEach {
+                vectorString.append(it.toString()).append(' ')
+            }
+            tableString.append(vectorString.toString().trim()).append("\n")
+        }
+        return tableString.toString().trim()
     }
-
-    fun col(c: Int) = List(numRows) { r -> get(c, r) }
-    fun row(r: Int) = List(numCols) { c -> get(c, r) }
 
     companion object {
-        operator fun <T> invoke(numCols: Int, numRows: Int, elementConstructor: (Int) -> T) = Table<T>(
+        operator fun <T> invoke(numRows: Int, numCols: Int, elementConstructor: (Pos) -> T) = Table<T>(
             numCols,
             numRows
         ).apply {
-            data = List(numCols * numRows) { elementConstructor(it) }
+            data = List(numRows) { y -> List(numCols) { x -> elementConstructor(x xy y) } }
         }
     }
 }

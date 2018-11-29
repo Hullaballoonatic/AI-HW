@@ -1,8 +1,10 @@
 package controller
 
-enum class Action {
-    MOVE_LEFT,
-    MOVE_UP,
-    MOVE_RIGHT,
-    MOVE_DOWN;
+enum class Action(val label: Char) {
+    MOVE_LEFT('˂'),
+    MOVE_RIGHT('˃'),
+    MOVE_UP('˄'),
+    MOVE_DOWN('˅');
+
+    override fun toString(): String = label.toString()
 }

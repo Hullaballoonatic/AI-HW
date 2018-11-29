@@ -1,6 +1,9 @@
 package model.table
 
 data class Pos(val x: Int, val y: Int) {
+    val row get() = y
+    val col get() = x
+
     operator fun compareTo(o: Pos): Int {
         return when {
             x > o.x -> 1
@@ -13,19 +16,8 @@ data class Pos(val x: Int, val y: Int) {
         }
     }
 
-    operator fun compareTo(o: Pair<Int, Int>): Int {
-        return when {
-            x > o.first -> 1
-            x < o.first -> -1
-            else        -> when {
-                y > o.second -> 1
-                y < o.second -> -1
-                else         -> 0
-            }
-        }
-    }
-
     override fun toString() = "($x, $y)"
 }
 
-infix fun Int.p(o: Int) = Pos(this, o)
+infix fun Int.xy(o: Int) = Pos(this, o)
+infix fun Int.rc(o: Int) = Pos(o, this)

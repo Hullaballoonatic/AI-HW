@@ -1,9 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-object Params {
-    const val tornadofxVersion = "1.7.17"
-}
-
 plugins {
     java
     application
@@ -18,7 +14,6 @@ repositories {
 }
 
 dependencies {
-    compile("no.tornado", "tornadofx", Params.tornadofxVersion)
     compile(kotlin("stdlib-jdk8"))
     testCompile("junit", "junit", "4.12")
 }

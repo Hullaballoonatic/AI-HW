@@ -5,56 +5,53 @@ import controller.Action.MOVE_DOWN
 import controller.Action.MOVE_LEFT
 import controller.Action.MOVE_RIGHT
 import controller.Action.MOVE_UP
-import controller.Settings.GOAL_LOCATION
+import controller.Settings.GOAL_REWARD
+import controller.Settings.HAZARD_REWARD
 import controller.Settings.NUM_COLS
 import controller.Settings.NUM_HAZARDS
 import controller.Settings.NUM_ROWS
-import controller.Settings.START_LOCATION
-import model.table.Pos
-import model.table.Table
 import model.grid.SpaceType.*
-import model.table.p
+import model.table.*
+import java.io.*
 import java.util.*
 
 @Suppress("unused")
-class GridWorld(val numCols: Int = NUM_COLS, val numRows: Int = NUM_ROWS, val goal: Pos = GOAL_LOCATION, val start: Pos = START_LOCATION, numHazards: Int = NUM_HAZARDS) {
-    private val hazards: List<Pos> = List(numHazards) {
+class GridWorld(val numCols: Int = NUM_COLS, val numRows: Int = NUM_ROWS, val startPosition: Pos = 0 xy 0, private val goalPosition: Pos = numCols - 1 xy numRows - 1, private val goalReward: Double = GOAL_REWARD, hazardPositions: List<Pos>? = null, private val hazardReward: Double = HAZARD_REWARD, numHazards: Int = NUM_HAZARDS, val endPositions: List<Pos> = listOf(goalPosition)) {
+    private val hazards: List<Pos> = hazardPositions ?: List(numHazards) {
         var p: Pos
         do {
             val x = rand.nextInt(numCols)
             val y = rand.nextInt(numRows)
-            p = x p y
-        } while (p == start || p == goal)
+            p = x xy y
+        } while (p == startPosition || p == goalPosition)
         p
     }
 
     val size = NUM_COLS * NUM_ROWS
 
-    private val reservedPositions: List<Pos> = (listOf(start, goal) + hazards)
+    private val reservedPositions: List<Pos> = (listOf(startPosition, goalPosition) + hazards)
 
-    private val table = Table(numRows, numCols) {
-        val x = it % numCols
-        val y = (it - x) / numCols
-        val p = x p y
-        val type = when (p) {
-            start -> START
-            goal -> GOAL
+    private val table = Table(numRows = numRows, numCols = numCols) {
+        Space(it, when (it) {
+            startPosition -> START
+            goalPosition -> GOAL
             in hazards -> HAZARD
             else -> NONE
-        }
-        Space(p, type)
+        })
     }
 
+    val spaces get() = table
+
     val viableActions = HashMap<Pos, List<Action>>(numRows * numCols).apply {
-        for (pos in table.data.map { it.pos }) {
+        for (pos in table.data.flatten().map { it.pos }) {
             val actions = arrayListOf<Action>()
-            if (pos.x > 0)
+            if (pos.col > 0)
                 actions += MOVE_LEFT
-            if (pos.y > 0)
-                actions += MOVE_UP
-            if (pos.x < numCols - 1)
+            if (pos.col < numCols - 1)
                 actions += MOVE_RIGHT
-            if (pos.y < numRows - 1)
+            if (pos.row > 0)
+                actions += MOVE_UP
+            if (pos.row < numRows - 1)
                 actions += MOVE_DOWN
             put(pos, actions)
         }
@@ -63,30 +60,29 @@ class GridWorld(val numCols: Int = NUM_COLS, val numRows: Int = NUM_ROWS, val go
     fun updateMove(pos: Pos, action: Action): Boolean {
         val altered = table[pos].action != action
         table[pos].action = action
-        if (pos !in reservedPositions)
-            table[pos].type = when(action) {
-                MOVE_UP -> SpaceType.MOVE_UP
-                MOVE_LEFT -> SpaceType.MOVE_LEFT
-                MOVE_DOWN -> SpaceType.MOVE_DOWN
-                MOVE_RIGHT -> SpaceType.MOVE_RIGHT
-            }
         return altered
     }
 
-    fun reward(pos: Pos) = table[pos].type.reward
+    fun reward(pos: Pos) = when(table[pos].type) {
+        GOAL -> goalReward
+        HAZARD -> hazardReward
+        else -> 0.0
+    }
 
     /*
     PRINTING SECTION
      */
     private val header: String = StringBuilder().apply {
-        append(" |")
+        append("  ")
         for (x in 0 until numCols)
-            append("${x.toSingleChar()}|")
+            append("${x.toSingleChar()} ")
     }.toString()
 
     private val separator: String = StringBuilder().apply {
-        for (col in 0..numCols)
-            append("-+")
+        append(" ")
+        for (col in 0 until numCols)
+            append("+-")
+        append("+")
     }.toString()
 
     private fun Int.toSingleChar() = when {
@@ -101,7 +97,7 @@ class GridWorld(val numCols: Int = NUM_COLS, val numRows: Int = NUM_ROWS, val go
         val sb = StringBuilder().append(y.toSingleChar()).append("|")
         for (x in (0 until numCols))
             if (x == c) sb.append("☺").append("|")
-            else sb.append(table[x, y].type.label).append("|")
+            else sb.append(table[x, y]).append("|")
         return sb.toString()
     }
 
@@ -116,11 +112,19 @@ class GridWorld(val numCols: Int = NUM_COLS, val numRows: Int = NUM_ROWS, val go
         println(separator)
     }
 
-    fun print() {
+    fun printDirections(output: PrintStream = System.out) {
         for (y in 0 until numRows) {
             for (x in 0 until numCols)
-                print(table[x, y].type.label)
-            println()
+                output.print(table[x, y].action?.label ?: " ")
+            output.println()
+        }
+    }
+
+    fun print(output: PrintStream = System.out) {
+        for (y in 0 until numRows) {
+            for (x in 0 until numCols)
+                output.print(table[x, y])
+            output.println()
         }
     }
 

@@ -1,5 +1,6 @@
 
 *.xml
+.idea/
 Breadth-First-Search/.idea/
 Breadth-First-Search/build/
 Genetic Algorithm/build/
